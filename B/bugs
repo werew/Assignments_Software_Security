@@ -1,0 +1,6 @@
+
+# Format string bug, found at compilation
+main.c:70         fprintf(printFile, command); cc1: all warnings being treated as errors
+
+
+
