@@ -67,7 +67,7 @@ int handle_command(FILE* printFile, sortedcontainer* sc, char* command) {
         break;
     default: {
         fprintf(printFile, "No such command: ");
-        fprintf(printFile, command);
+        fprintf(printFile, "%s\n", command); // TODO this is a fast fix, but what if command is multiple words?
         fprintf(printFile, "\n");
         break;
     }
