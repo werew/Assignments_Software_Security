@@ -3,4 +3,6 @@ Trailing chars (after name, ex: i 23 luigi blablabla...)
 # C standard (POSIX? C89 (ansii C)?) // note: flag -std=c99
 Negative ages
 Can we make a selections of bugs (we found too many and they don't fit in 2 pages) ?
+Can we change the protorype of a function (ex: sortedcontainer_insert fails silently
+if node_new return NULL) ?
 
