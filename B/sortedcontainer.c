@@ -41,8 +41,8 @@ void node_delete(node* n) {
 }
 
 sortedcontainer* sortedcontainer_new() {
-    sortedcontainer* d = (sortedcontainer*)malloc(sizeof(sortedcontainer));
-    d->root = NULL;
+    sortedcontainer* d = (sortedcontainer*)malloc(sizeof(sortedcontainer)); //TODO check return
+    d->root = NULL; //TODO potentian NULL pointer dereferencing
     return d;
 }
 
