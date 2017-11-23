@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <ctype.h>
+#include <limits.h>
 
 #include "sortedcontainer.h"
 #include "test.h"
@@ -20,18 +23,16 @@ void print_prompt(FILE* f) {
  * @brief Basic parser to read data from @c command
  * @param command The command string to read the data from
  * @return A new data object or a NULL pointer in case of error
- *
- * TO FIX:
- *   There are two serious problems in this function that are related
+ *         in this case errno is set accordingly
  *
  * BUGS FIXED:
  *
  * - Stack-based buffer overflow: 
  *      if the length of the 3rd argument of the command was bigger than
- *      NAME_LENGTH then `scanf` would have writtend beyond the bounds
+ *      NAME_LENGTH then `scanf` would have written beyond the bounds
  *      of the array `name`. 
  *
- * - Potential uninitialazed values:
+ * - Potential uninitialized values:
  *      in case of failure of `scanf`, `name` and/or `age` are used by the
  *      program without a proper initialization. This can be easily accomplished
  *      by an attacker by causing a "matching failure" (for example with the
@@ -39,13 +40,13 @@ void print_prompt(FILE* f) {
  *      potentially sensitive data from the stack.
  *
  * - Potential integer overflow (or underflow):
- *     a big (or too small negative) age could have lead to an integer overvlow
+ *     a big (or too small negative) age could have lead to an integer overflow
  *     (or underflow respectively. This could have resulted in unintended behaviour.
  *
  * OBSERVATIONS:
  *
  * - Negative ages are allowed:
- *      ages are by their neture always positives, on the other hand the program
+ *      ages are by their nature always positives, on the other hand the program
  *      accepts also negative ages. Given that in the type `data` the field age
  *      is defined as a signed integer (and we were told not to modify type 
  *      definitions) we suppose that this is indeed an intended behaviour.
@@ -57,10 +58,84 @@ void print_prompt(FILE* f) {
  *
  */
 data* read_data(char const* command) {
-    int age;
-    char name[NAME_LENGTH];
-    sscanf(command, "%*s %i %s", &age, name);
-    return data_new(age, name);
+    /* Some declarations */
+    long int age;           // a long int is necessary for strtol
+    char name[NAME_LENGTH]; 
+    char const *p = command;
+    char *endptr;
+
+
+    /* 1. Skip command name */
+    for (; isspace((int) *p); p++); // 1) Skip initial spaces (if any)
+    for (; isalpha((int) *p); p++); // 2) Skip command name
+
+
+    /* 2. Read age: for safety reasons we favor strtol over atoi or scanf,
+          since this function let us check the validity of the output  */
+
+    errno = 0;                      // So we can distinguish success/failure after call
+    age = strtol(p, &endptr, 0);
+
+    // Check for invalid age
+    if ((errno == ERANGE && (age == LONG_MAX || age == LONG_MIN)) ||
+        (errno != 0 && age == 0)) return NULL;
+
+    // Check if age was found
+    if (endptr == p){
+        errno = EINVAL;
+        return NULL;
+    }
+
+    // Check for int overflow/underflow 
+    // (we make sure that age is a valid int before the cast)
+    if (age > INT_MAX || age < INT_MIN){
+        errno = ERANGE;
+        return NULL;
+    }
+
+    p = endptr;   // Move forward
+
+
+    /* 3. Read name */
+    for (; isspace((int) *p); p++);  // Skip initial spaces (if any)
+
+    unsigned int i = 0;
+    while (isalpha((int) *p)){       // We allow only letters inside a name (TODO ask if it's ok)
+
+        // Fail if the name is too long
+        if (i >= NAME_LENGTH - 1) {
+            errno = EINVAL;
+            return NULL; 
+        }
+
+        name[i++] = *p++;            // Copy character 
+    }
+
+    name[i] = '\0';                  // Null-terminate string
+    
+    // Fail if name was not found
+    if (i == 0){
+        errno = EINVAL;
+        return NULL;
+    }
+
+    // Fail if an invalid character was encountered
+    if (*p != '\0' && isspace((int)*p) == 0){
+        errno = EINVAL;
+        return NULL;
+    }
+
+    for (; isspace((int) *p); p++);  // Skip trailing spaces (if any)
+   
+    // Fail if the command contains unnecessary extra arguments (TODO ask) 
+    if (*p != '\0'){
+        errno = EINVAL;
+        return NULL;
+    }
+
+    
+    /* 4. Create and return new data struct */
+    return data_new((int) age, name);
 }
 
 /**
