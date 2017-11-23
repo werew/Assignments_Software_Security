@@ -48,15 +48,49 @@ void node_delete(node* n) {
 
 sortedcontainer* sortedcontainer_new() {
     sortedcontainer* d = (sortedcontainer*)malloc(sizeof(sortedcontainer)); //TODO check return
-    d->root = NULL; //TODO potentian NULL pointer dereferencing
+    d->root = NULL; //TODO potential NULL pointer dereferencing
     return d;
 }
 
 void sortedcontainer_insert(sortedcontainer* sc, data* data) {
+
+    /* Create new node */
     node* n = node_new(data);
-    // Implement this
-    (void)sc;
-    (void)n;
+    if (n == NULL){         // Fail silently 
+        data_delete(data);
+        return; 
+    }
+
+    /* If the tree is empty, insert as root */
+    if (sc->root == NULL){
+        sc->root = n;
+        return;
+    } 
+
+    /* Traverse the tree and insert as a leaf */
+    node* p = sc->root;     // Parent node
+    while (1){
+        switch (data_compare(data, p->data)){
+
+            case -1: if (p->left == NULL){
+                         p->left = n;
+                         return;
+                     }
+                     p = p->left;
+                break;
+
+            case  1: if (p->right == NULL){
+                         p->right = n;
+                         return;
+                     }
+                     p = p->right;
+                break;
+
+            default: // Node is already inside the tree
+                     node_delete(n);
+                     return;     
+        } 
+    }
 }
 
 int sortedcontainer_erase(sortedcontainer* sc, data* data) {
