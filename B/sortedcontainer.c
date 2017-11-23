@@ -42,8 +42,8 @@ node* node_new(data* d) {
 }
 
 void node_delete(node* n) {
-    // Implement this
-    (void)n;
+    data_delete(n->data);
+    free(n);
 }
 
 sortedcontainer* sortedcontainer_new() {
