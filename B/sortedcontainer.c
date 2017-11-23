@@ -67,9 +67,18 @@ int sortedcontainer_erase(sortedcontainer* sc, data* data) {
 }
 
 int sortedcontainer_contains(sortedcontainer* sc, data* data) {
-    // Implement this
-    (void)sc;
-    (void)data;
+    node* n = sc->root;
+
+    while (n != NULL){
+        switch (data_compare(data, n->data)){
+            case -1: n = n->left;
+                break;
+            case  1: n = n->right;
+                break;
+            default: return 1;
+        } 
+    }
+
     return 0;
 }
 
