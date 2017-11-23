@@ -13,16 +13,48 @@
  * @param f The FILE to print the prompt to.
  */
 void print_prompt(FILE* f) {
-    fprintf(f, "\n> "); fflush(f);
+    fprintf(f, "\n> "); fflush(f); //TODO uncaught IO errors (maybe explain why we don't consired it harmful)
 }
 
 /**
  * @brief Basic parser to read data from @c command
  * @param command The command string to read the data from
- * @return A new data object
+ * @return A new data object or a NULL pointer in case of error
  *
  * TO FIX:
  *   There are two serious problems in this function that are related
+ *
+ * BUGS FIXED:
+ *
+ * - Stack-based buffer overflow: 
+ *      if the length of the 3rd argument of the command was bigger than
+ *      NAME_LENGTH then `scanf` would have writtend beyond the bounds
+ *      of the array `name`. 
+ *
+ * - Potential uninitialazed values:
+ *      in case of failure of `scanf`, `name` and/or `age` are used by the
+ *      program without a proper initialization. This can be easily accomplished
+ *      by an attacker by causing a "matching failure" (for example with the
+ *      input: "i not_a_number foo") and could be used, for example, to leak 
+ *      potentially sensitive data from the stack.
+ *
+ * - Potential integer overflow (or underflow):
+ *     a big (or too small negative) age could have lead to an integer overvlow
+ *     (or underflow respectively. This could have resulted in unintended behaviour.
+ *
+ * OBSERVATIONS:
+ *
+ * - Negative ages are allowed:
+ *      ages are by their neture always positives, on the other hand the program
+ *      accepts also negative ages. Given that in the type `data` the field age
+ *      is defined as a signed integer (and we were told not to modify type 
+ *      definitions) we suppose that this is indeed an intended behaviour.
+ *
+ * - Return value could be NULL:
+ *      `data_new` could return a NULL pointer (in case of failure of malloc),
+ *      therefore `read_data` could also return NULL but this behaviour was not
+ *      documented in the specifications
+ *
  */
 data* read_data(char const* command) {
     int age;
