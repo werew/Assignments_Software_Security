@@ -1,6 +1,13 @@
 
+##### At compilation #####
+
 # Format string bug, found at compilation
 main.c:70         fprintf(printFile, command); cc1: all warnings being treated as errors
+
+##### Using ccpcheck --enable=all *.c *.h #####
+[main.c:40]: (portability) scanf without field width limits can crash with huge input data on some versions of libc.
+[main.c:40]: (warning) scanf without field width limits can crash with huge input data.
+
 
 
 
