@@ -30,9 +30,15 @@ void data_delete(data* d) {
 }
 
 node* node_new(data* d) {
-    // Implement this
-    (void)d;
-    return NULL;
+
+    node* n = (node*) malloc(sizeof(node));
+    if (n == NULL) return NULL;
+
+    n->data  = d;
+    n->left  = NULL;
+    n->right = NULL;
+
+    return n;
 }
 
 void node_delete(node* n) {

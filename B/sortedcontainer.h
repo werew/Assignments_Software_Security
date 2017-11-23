@@ -45,6 +45,11 @@ data* data_new(int age, char const* name);
  */
 void data_delete(data* d);
 
+/**
+ * @brief Creates a new node
+ * @param d The data that the node will contain
+ * @return A pointer to the new node or NULL in case of error
+ */
 node* node_new(data* d);
 
 void node_delete(node* n);
