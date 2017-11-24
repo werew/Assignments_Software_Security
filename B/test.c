@@ -380,8 +380,8 @@ int test6(FILE* printFile) {
     ASSERT(!data_compare(f, sc->root->left->right->data), "data is not equivalent");
     ASSERT(f == sc->root->left->right->data, "data is not the same instant");
 
-    ASSERT(!data_compare(a, sc->root->left->left->data), "data is not equivalent");
-    ASSERT(a == sc->root->left->left->data, "data is not the same instant");
+    ASSERT(!data_compare(a, sc->root->left->left->left->data), "data is not equivalent");
+    ASSERT(a == sc->root->left->left->left->data, "data is not the same instant");
 
     ASSERT(!data_compare(c, sc->root->left->left->right->data), "data is not equivalent");
     ASSERT(c == sc->root->left->left->right->data, "data is not the same instant");
@@ -418,8 +418,8 @@ int test6(FILE* printFile) {
     ASSERT(!data_compare(f, sc->root->left->right->data), "data is not equivalent");
     ASSERT(f == sc->root->left->right->data, "data is not the same instant");
 
-    ASSERT(!data_compare(a, sc->root->left->left->data), "data is not equivalent");
-    ASSERT(a == sc->root->left->left->data, "data is not the same instant");
+    ASSERT(!data_compare(a, sc->root->left->left->left->data), "data is not equivalent");
+    ASSERT(a == sc->root->left->left->left->data, "data is not the same instant");
 
     ASSERT(!data_compare(c, sc->root->left->left->right->data), "data is not equivalent");
     ASSERT(c == sc->root->left->left->right->data, "data is not the same instant");
