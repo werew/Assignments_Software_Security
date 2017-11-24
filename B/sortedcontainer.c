@@ -19,7 +19,7 @@ void data_print(data* d, FILE* f) {
 }
 
 data* data_new(int age, char const* name) {
-    data* d = (data*)malloc(sizeof(data));
+    data* d = (data*)malloc(sizeof(data));  // TODO if NULL
     d->age = age;
     strncpy(d->name, name, NAME_LENGTH);
     return d;
