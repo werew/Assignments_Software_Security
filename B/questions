@@ -6,4 +6,5 @@ Can we make a selections of bugs (we found too many and they don't fit in 2 page
 Can we change the protorype of a function (ex: sortedcontainer_insert fails silently
 if node_new return NULL) ?
 Are we free in the implementation of sortedcontainer_erase ?
+There are more than two problems in read_command, but you say we can change only two lines.
 
