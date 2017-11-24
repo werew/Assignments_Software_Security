@@ -189,7 +189,12 @@ int handle_command(FILE* printFile, sortedcontainer* sc, const char* command) {
  *
  * TO FIX:
  *   There are two separate problems in this function. Fix these problems
- *   by only changing TWO lines in total.
+ *   by only changing TWO lines in total. TODO there are more than 2, ask
+ *
+ * BUGS FIXED:
+ *  - Invalid reads/writes on the heap:
+ *      the pointer inputAt was not appropriately updated after reallocating
+ *      the buffer.
  */
 char* read_command(FILE* in) {
     int inputMaxLength = 0;
@@ -209,7 +214,7 @@ char* read_command(FILE* in) {
         }
         inputMaxLength += INPUT_INCREMENT;
         input = realloc(input, sizeof(char) * inputMaxLength);  // TODO if return NULL, memory leak
-        inputAt += incr - 1;
+        inputAt = input + inputMaxLength - INPUT_INCREMENT - 1;
         incr = INPUT_INCREMENT + 1;
     } while(1);
     input[strlen(input)-1] = 0;
