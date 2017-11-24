@@ -73,5 +73,43 @@ main.c:70         fprintf(printFile, command); cc1: all warnings being treated a
 ==12654==
 
 
+### with commands: i 1,p
+# The value returned by read_data was used without any check
+==12839== Invalid read of size 4
+==12839==    at 0x400C04: data_print (sortedcontainer.c:18)
+==12839==    by 0x4010DE: node_printtree (sortedcontainer.c:177)
+==12839==    by 0x40116E: sortedcontainer_print (sortedcontainer.c:188)
+==12839==    by 0x4015C8: handle_command (main.c:167)
+==12839==    by 0x40179A: main (main.c:248)
+==12839==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+==12839==
+==12839==
+==12839== Process terminating with default action of signal 11 (SIGSEGV)
+==12839==  Access not within mapped region at address 0x0
+==12839==    at 0x400C04: data_print (sortedcontainer.c:18)
+==12839==    by 0x4010DE: node_printtree (sortedcontainer.c:177)
+==12839==    by 0x40116E: sortedcontainer_print (sortedcontainer.c:188)
+==12839==    by 0x4015C8: handle_command (main.c:167)
+==12839==    by 0x40179A: main (main.c:248)
+==12839==  If you believe this happened as a result of a stack
+==12839==  overflow in your program's main thread (unlikely but
+==12839==  possible), you can try to increase the size of the
+==12839==  main thread stack using the --main-stacksize= flag.
+==12839==  The main thread stack size used in this run was 8388608.
+ ==12839==
+==12839== HEAP SUMMARY:
+==12839==     in use at exit: 42 bytes in 3 blocks
+==12839==   total heap usage: 4 allocs, 1 frees, 52 bytes allocated
+==12839==
+==12839== LEAK SUMMARY:
+==12839==    definitely lost: 0 bytes in 0 blocks
+==12839==    indirectly lost: 0 bytes in 0 blocks
+==12839==      possibly lost: 0 bytes in 0 blocks
+==12839==    still reachable: 42 bytes in 3 blocks
+==12839==         suppressed: 0 bytes in 0 blocks
+==12839== Rerun with --leak-check=full to see details of leaked memory
+==12839==
+==12839== For counts of detected and suppressed errors, rerun with: -v
+==12839== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
 
 

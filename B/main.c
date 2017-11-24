@@ -146,18 +146,35 @@ data* read_data(char const* command) {
  * @return 1 iff the problem should quit, otherwise 0
  *
  * TO FIX:
- *   There are three problems in this function, two of which are related
+ *   There are three problems in this function, two of which are related //TODO 3 ?
+ *
+ * BUGS FIXED:
+ *
+ *  - Format string bug:
+ *      command was passed directly to fprintf and interpreted as a format
+ *      string. Using this vulnerability an attacker could have leaked
+ *      or manipulated the memory.
+ *
+ *  - Return value of read_data not checked for errors:
+ *      in case of error (eg. invalid command parameters) the value 
+ *      returned by read_data is used without any further check.
+ *
  */
 int handle_command(FILE* printFile, sortedcontainer* sc, const char* command) {
+    data* d = NULL;
+ 
     switch(*command) {
     case 'i':
-        sortedcontainer_insert(sc, read_data(command));
+        if ((d = read_data(command)) == NULL) goto error_handler;
+        sortedcontainer_insert(sc, d);
         break;
     case 'e':
-        sortedcontainer_erase(sc, read_data(command));
+        if ((d = read_data(command)) == NULL) goto error_handler;
+        sortedcontainer_erase(sc, d);
         break;
     case 'c':
-        if(sortedcontainer_contains(sc, read_data(command))) {
+        if ((d = read_data(command)) == NULL) goto error_handler;
+        if(sortedcontainer_contains(sc, d)) {
             fprintf(printFile, "y\n");
         } else {
             fprintf(printFile, "n\n");
@@ -174,11 +191,29 @@ int handle_command(FILE* printFile, sortedcontainer* sc, const char* command) {
         break;
     default: {
         fprintf(printFile, "No such command: ");
-        fprintf(printFile, "%s\n", command); // TODO this is a fast fix, but what if command is multiple words?
+        fprintf(printFile, "%s\n", command); 
         fprintf(printFile, "\n");
         break;
     }
     }
+    return 0;
+
+error_handler: 
+    /* XXX IMPORTANT: Please don't be mad for this `goto`.
+       While most C purists think `goto` statements should never be 
+       used, we think that a resposable use of `goto` can help
+       code's readability (we don't like spagetti code too). 
+       One of C programmers most common practices is to use `goto` 
+       to directly jump to an error handler when needed (such practice
+       can be found in many famous projects as for example: 
+       linux, apache, valgind, etc..)                           */
+       
+    if (errno == ERANGE || errno == EINVAL){
+        fprintf(printFile,"Invalid input\n");
+    } else {
+        fprintf(printFile, "%s", strerror(errno)); 
+    }
+
     return 0;
 }
 
