@@ -20,7 +20,7 @@ typedef struct {
  * @brief Compares @c d1 and @c d2
  * @param d1 Data to be compared
  * @param d2 Data to be compared
- * @return -1 if d1 < d2, 1 if d2 > 1, 0 otherwise
+ * @return -1 if d1 < d2, 1 if d2 > 1, 0 otherwise //XXX typo
  */
 int data_compare(data* d1, data* d2);
 
