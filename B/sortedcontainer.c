@@ -71,21 +71,18 @@ void sortedcontainer_insert(sortedcontainer* sc, data* data) {
     node* p = sc->root;     // Parent node
     while (1){
         switch (data_compare(data, p->data)){
-
             case -1: if (p->left == NULL){
                          p->left = n;
                          return;
                      }
                      p = p->left;
                 break;
-
             case  1: if (p->right == NULL){
                          p->right = n;
                          return;
                      }
                      p = p->right;
                 break;
-
             default: // Node is already inside the tree
                      node_delete(n);
                      return;     
@@ -93,10 +90,63 @@ void sortedcontainer_insert(sortedcontainer* sc, data* data) {
     }
 }
 
+static void _node_removal(node* p, node* n){
+
+    if (n->left  == NULL){
+        /* Node has right child or is a leaf */
+        if (p->right == n) p->right = n->right;
+        else               p->left  = n->right;
+        node_delete(n);
+
+    } else if (n->right == NULL){
+        /* Node has left child */
+        if (p->right == n) p->right = n->left;
+        else               p->left  = n->left;
+        node_delete(n);
+
+    } else {
+        /* Node has both children */
+    
+        // Find smaller child on right branch
+        node* pc = n;               // Child's parent
+        node* c  = n->right;        // Child
+        for (; c->left != NULL; pc = c, c = c->left);
+
+        // Move child data on top
+        data_delete(n->data);
+        n->data = c->data;
+ 
+        // Remove child
+        if (pc == n) n->right = c->right;
+        else         pc->left = c->right;
+
+        c->data = NULL;     // So we don't free the data
+        node_delete(c); 
+    }
+}
+
 int sortedcontainer_erase(sortedcontainer* sc, data* data) {
-    // Implement this
-    (void)sc;
-    (void)data;
+
+    /* Traverse the tree and remove */
+    node* n = sc->root; // Target node
+    node* p = NULL;     // Parent node
+
+    while (n != NULL){
+        switch (data_compare(data, n->data)){
+            case -1: p = n;
+                     n = n->left; 
+                break;
+            case  1: p = n;
+                     n = n->right;
+                break;
+            default: // Delete node
+                     _node_removal(p,n);                 
+                     return 1;
+                break;
+        } 
+    }
+    
+    // Node not found
     return 0;
 }
 
