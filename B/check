@@ -1,0 +1,8 @@
+cppcheck --enable=all --std=c99 --check-config             \
+        -I /usr/lib/gcc/x86_64-linux-gnu/4.8/include       \
+        -I /usr/local/include                              \
+        -I /usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed \
+        -I /usr/include/x86_64-linux-gnu                   \
+        -I /usr/include                                    \
+        *.h *.c
+
