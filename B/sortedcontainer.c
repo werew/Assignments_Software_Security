@@ -90,18 +90,22 @@ void sortedcontainer_insert(sortedcontainer* sc, data* data) {
     }
 }
 
-static void _node_removal(node* p, node* n){
+
+// Note: n is the root (ie. sc->root == n) iff p == NULL (ie. n has no parent)
+static void _node_removal(sortedcontainer* sc, node* p, node* n){
 
     if (n->left  == NULL){
         /* Node has right child or is a leaf */
-        if (p->right == n) p->right = n->right;
-        else               p->left  = n->right;
+        if (p == NULL)          sc->root = n->right;
+        else if (p->right == n) p->right = n->right;
+        else                    p->left  = n->right;
         node_delete(n);
 
     } else if (n->right == NULL){
         /* Node has left child */
-        if (p->right == n) p->right = n->left;
-        else               p->left  = n->left;
+        if (p == NULL)          sc->root = n->left;
+        else if (p->right == n) p->right = n->left;
+        else                    p->left  = n->left;
         node_delete(n);
 
     } else {
@@ -140,7 +144,7 @@ int sortedcontainer_erase(sortedcontainer* sc, data* data) {
                      n = n->right;
                 break;
             default: // Delete node
-                     _node_removal(p,n);                 
+                     _node_removal(sc,p,n);                 
                      return 1;
                 break;
         } 
