@@ -225,12 +225,103 @@ int test4(FILE* printFile) {
     return 0;
 }
 
+// Test the deletion of a node with two children, who each have two children as well
 int test5(FILE* printFile) {
     (void)printFile;
 
-    // Add a test in the style of test3 to test the deletion of a node with
-    // two children, who each have two children as well
-    ASSERT(0, "implement this test");
+    sortedcontainer* sc = sortedcontainer_new();
+
+    data* a = data_new(10, "a");
+    data* b = data_new(15, "b");
+    data* c = data_new(20, "c");
+    data* d = data_new(25, "d");
+    data* e = data_new(30, "e");
+    data* f = data_new(35, "f");
+    data* g = data_new(40, "g");
+
+    sortedcontainer_insert(sc, d);  
+    sortedcontainer_insert(sc, b);  
+    sortedcontainer_insert(sc, f);  
+    sortedcontainer_insert(sc, a);  
+    sortedcontainer_insert(sc, c);  
+    sortedcontainer_insert(sc, e);  
+    sortedcontainer_insert(sc, g);  
+
+    /**
+     *  1. Test tree's initial state:
+     *
+     *               d 
+     *              / \
+     *            b     f 
+     *           / \   / \
+     *          a   c e   g
+     */
+
+    ASSERT(sc != NULL, "failed to create sorted container");
+    ASSERT(sc->root != NULL, "root is NULL");
+    ASSERT(sc->root->data != NULL, "root->data is NULL");
+
+    ASSERT(!data_compare(d, sc->root->data), "data is not equivalent");
+    ASSERT(d == sc->root->data, "data is not the same instant");
+
+    ASSERT(!data_compare(b, sc->root->left->data), "data is not equivalent");
+    ASSERT(b == sc->root->left->data, "data is not the same instant");
+
+    ASSERT(!data_compare(f, sc->root->right->data), "data is not equivalent");
+    ASSERT(f == sc->root->right->data, "data is not the same instant");
+
+    ASSERT(!data_compare(a, sc->root->left->left->data), "data is not equivalent");
+    ASSERT(a == sc->root->left->left->data, "data is not the same instant");
+
+    ASSERT(!data_compare(c, sc->root->left->right->data), "data is not equivalent");
+    ASSERT(c == sc->root->left->right->data, "data is not the same instant");
+
+    ASSERT(!data_compare(e, sc->root->right->left->data), "data is not equivalent");
+    ASSERT(e == sc->root->right->left->data, "data is not the same instant");
+
+    ASSERT(!data_compare(g, sc->root->right->right->data), "data is not equivalent");
+    ASSERT(g == sc->root->right->right->data, "data is not the same instant");
+
+    /**
+     *  2. Test tree after deleting d:
+     *
+     *               e 
+     *              / \
+     *            b     f 
+     *           / \     \
+     *          a   c     g
+     */
+
+    sortedcontainer_erase(sc, d);
+
+    ASSERT(!data_compare(e, sc->root->data), "data is not equivalent");
+    ASSERT(e == sc->root->data, "data is not the same instant");
+
+    ASSERT(!data_compare(b, sc->root->left->data), "data is not equivalent");
+    ASSERT(b == sc->root->left->data, "data is not the same instant");
+
+    ASSERT(!data_compare(f, sc->root->right->data), "data is not equivalent");
+    ASSERT(f == sc->root->right->data, "data is not the same instant");
+
+    ASSERT(!data_compare(a, sc->root->left->left->data), "data is not equivalent");
+    ASSERT(a == sc->root->left->left->data, "data is not the same instant");
+
+    ASSERT(!data_compare(c, sc->root->left->right->data), "data is not equivalent");
+    ASSERT(c == sc->root->left->right->data, "data is not the same instant");
+
+    ASSERT(!data_compare(g, sc->root->right->right->data), "data is not equivalent");
+    ASSERT(g == sc->root->right->right->data, "data is not the same instant");
+
+    ASSERT(sc->root->right->left == NULL, "right child of f' node is not NULL");
+
+    ASSERT(sortedcontainer_contains(sc, a), "data is not in the container anymore (sortedcontainer_contains)");
+    ASSERT(sortedcontainer_contains(sc, b), "data is not in the container anymore (sortedcontainer_contains)");
+    ASSERT(sortedcontainer_contains(sc, c), "data is not in the container anymore (sortedcontainer_contains)");
+    ASSERT(sortedcontainer_contains(sc, e), "data is not in the container anymore (sortedcontainer_contains)");
+    ASSERT(sortedcontainer_contains(sc, f), "data is not in the container anymore (sortedcontainer_contains)");
+    ASSERT(sortedcontainer_contains(sc, g), "data is not in the container anymore (sortedcontainer_contains)");
+
+    sortedcontainer_delete(sc);
 
     return 0;
 }
