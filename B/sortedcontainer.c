@@ -42,6 +42,7 @@ node* node_new(data* d) {
 }
 
 void node_delete(node* n) {
+    if (n == NULL) return; // Same behaviour as free
     data_delete(n->data);
     free(n);
 }
