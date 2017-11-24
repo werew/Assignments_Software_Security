@@ -8,6 +8,30 @@ main.c:70         fprintf(printFile, command); cc1: all warnings being treated a
 [main.c:40]: (portability) scanf without field width limits can crash with huge input data on some versions of libc.
 [main.c:40]: (warning) scanf without field width limits can crash with huge input data.
 
+#### Using valgrind --leak-check=full  --show-leak-kinds=all --track-origins=yes ./sint
+#### with commands: t,x
+
+# The memory allocated by read_command was never released 
+==9963== HEAP SUMMARY:
+==9963==     in use at exit: 20 bytes in 2 blocks
+==9963==   total heap usage: 59 allocs, 57 frees, 1,276 bytes allocated
+==9963==
+==9963== 20 bytes in 2 blocks are definitely lost in loss record 1 of 1
+==9963==    at 0x4C2AB80: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==9963==    by 0x40166A: read_command (main.c:202)
+==9963==    by 0x40176C: main (main.c:237)
+==9963==
+==9963== LEAK SUMMARY:
+==9963==    definitely lost: 20 bytes in 2 blocks
+==9963==    indirectly lost: 0 bytes in 0 blocks
+==9963==      possibly lost: 0 bytes in 0 blocks
+==9963==    still reachable: 0 bytes in 0 blocks
+==9963==         suppressed: 0 bytes in 0 blocks
+==9963==
+==9963== For counts of detected and suppressed errors, rerun with: -v
+==9963== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+
+
 
 
 

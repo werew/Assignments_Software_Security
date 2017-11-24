@@ -148,7 +148,7 @@ data* read_data(char const* command) {
  * TO FIX:
  *   There are three problems in this function, two of which are related
  */
-int handle_command(FILE* printFile, sortedcontainer* sc, char* command) {
+int handle_command(FILE* printFile, sortedcontainer* sc, const char* command) {
     switch(*command) {
     case 'i':
         sortedcontainer_insert(sc, read_data(command));
@@ -199,16 +199,16 @@ char* read_command(FILE* in) {
     int incr = INPUT_INCREMENT;
 
     inputMaxLength = incr;
-    input = (char*)malloc(sizeof(char) * incr);
+    input = (char*)malloc(sizeof(char) * incr);         // TODO if input is NULL
     inputAt = input;
     do {
         inputAt[incr - 1] = 'e';
-        if(fgets(inputAt, incr, in) == NULL) return NULL;
+        if(fgets(inputAt, incr, in) == NULL) return NULL;   // TODO memory leak if NULL (input lost)
         if(inputAt[incr - 1] != '\0' || inputAt[incr - 2] == '\n') {
             break;
         }
         inputMaxLength += INPUT_INCREMENT;
-        input = realloc(input, sizeof(char) * inputMaxLength);
+        input = realloc(input, sizeof(char) * inputMaxLength);  // TODO if return NULL, memory leak
         inputAt += incr - 1;
         incr = INPUT_INCREMENT + 1;
     } while(1);
@@ -222,14 +222,15 @@ char* read_command(FILE* in) {
  * @param argv Arguments
  * @return 0
  *
- * TO FIX:
- *   One issue needs to be fixed here.
+ * BUGS FIXED:
+ *  - Memory leak:
+ *      the memory allocated by read_command was never freed    
  */
 int main(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
 
-    sortedcontainer* sc = sortedcontainer_new();
+    sortedcontainer* sc = sortedcontainer_new(); // TODO check if NULL
 
     while(1) {
         print_prompt(stdout);
@@ -240,8 +241,11 @@ int main(int argc, char* argv[]) {
         }
 
         if(handle_command(stdout, sc, command)) {
+            free(command);
             break;
         }
+
+        free(command);
     }
 
     sortedcontainer_delete(sc);
