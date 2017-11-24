@@ -145,9 +145,6 @@ data* read_data(char const* command) {
  * @param command The command to handle
  * @return 1 iff the problem should quit, otherwise 0
  *
- * TO FIX:
- *   There are three problems in this function, two of which are related //TODO 3 ?
- *
  * BUGS FIXED:
  *
  *  - Format string bug:
@@ -156,9 +153,12 @@ data* read_data(char const* command) {
  *      or manipulated the memory.
  *
  *  - Return value of read_data not checked for errors:
- *      in case of error (eg. invalid command parameters) the value 
+ *      in case of error (eg. Invalid command parameters) the value 
  *      returned by read_data is used without any further check.
  *
+ *  - Return value of read_data not freed:
+ *      when erasing or checking the presence of certain data, the 
+ *      structure returned by read_data was not properly freed afterwards
  */
 int handle_command(FILE* printFile, sortedcontainer* sc, const char* command) {
     data* d = NULL;
@@ -166,19 +166,21 @@ int handle_command(FILE* printFile, sortedcontainer* sc, const char* command) {
     switch(*command) {
     case 'i':
         if ((d = read_data(command)) == NULL) goto error_handler;
-        sortedcontainer_insert(sc, d);
+        sortedcontainer_insert(sc, d);  // sortedcontainer_insert does claim ownership of d
         break;
     case 'e':
         if ((d = read_data(command)) == NULL) goto error_handler;
-        sortedcontainer_erase(sc, d);
+        sortedcontainer_erase(sc, d);   // sortedcontainer_erase does NOT claim ownership of d
+        data_delete(d);   
         break;
     case 'c':
         if ((d = read_data(command)) == NULL) goto error_handler;
-        if(sortedcontainer_contains(sc, d)) {
+        if(sortedcontainer_contains(sc, d)) {  // sortedcontainer_contains does NOT claim ownership of d
             fprintf(printFile, "y\n");
         } else {
             fprintf(printFile, "n\n");
         }
+        data_delete(d);   
         break;
     case 'p':
         sortedcontainer_print(sc, printFile);
@@ -201,8 +203,8 @@ int handle_command(FILE* printFile, sortedcontainer* sc, const char* command) {
 error_handler: 
     /* XXX IMPORTANT: Please don't be mad for this `goto`.
        While most C purists think `goto` statements should never be 
-       used, we think that a resposable use of `goto` can help
-       code's readability (we don't like spagetti code too). 
+       used, we think that a responsible use of `goto` can help
+       code's readability (we don't like spaghetti code too). 
        One of C programmers most common practices is to use `goto` 
        to directly jump to an error handler when needed (such practice
        can be found in many famous projects as for example: 
