@@ -232,6 +232,10 @@ error_handler:
  *  - Invalid reads/writes on the heap:
  *      the pointer inputAt was not appropriately updated after reallocating
  *      the buffer.
+ *
+ *  - Invalid write on the stack (off-by-one bug):
+ *      an input starting with a zero byte will cause
+ *      a write one byte out of the input buffer 
  */
 char* read_command(FILE* in) {
     int inputMaxLength = 0;
@@ -254,7 +258,7 @@ char* read_command(FILE* in) {
         inputAt = input + inputMaxLength - INPUT_INCREMENT - 1;
         incr = INPUT_INCREMENT + 1;
     } while(1);
-    input[strlen(input)-1] = 0; // TODO error if empty string
+    input[strlen(input) == 0 ? 0 : strlen(input)-1] = 0; // TODO error if empty string
     return input;
 }
 
