@@ -231,10 +231,6 @@ error_handler:
  * @param in FILE to read a command from
  * @return The read command
  *
- * TO FIX:
- *   There are two separate problems in this function. Fix these problems
- *   by only changing TWO lines in total. TODO there are more than 2, ask
- *
  * BUGS FIXED:
  *  - NULL pointer dereferencing (1):
  *      the pointer to the memory allocated by `malloc` is always used despite
@@ -279,6 +275,13 @@ error_handler:
  *      reading whiteout encountering a newline (in case of EOF), in that
  *      particular case the last character of the command given by the user
  *      would have been compromised.
+ *
+ *  - User input was dropped in some cases:
+ *      if EOF was encountered after reading exactly `incr-1` bytes 
+ *      `fgets` would have returned NULL and all the previously read
+ *      input would have been dropped. Since according to the original
+ *      version of this function an EOF terminating input was accepted
+ *      as a valid command, this is a bug.
  */
 char* read_command(FILE* in) {
 
@@ -303,11 +306,11 @@ char* read_command(FILE* in) {
         // if `fgets` puts a '\0' here
         inputAt[incr - 1] = 'e';
 
-        // TODO what if <0 
-        // TODO what if NULL after
         if(fgets(inputAt, incr, in) == NULL){
+            if (inputAt > input) break; // This covers the case when EOF is encountered
+                                        // after some bytes have already been read
             free(input);
-            return NULL; 
+            return NULL;
         }
 
         if(inputAt[incr - 1] != '\0' || inputAt[incr - 2] == '\n') break;
