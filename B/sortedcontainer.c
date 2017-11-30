@@ -93,22 +93,28 @@ void sortedcontainer_insert(sortedcontainer* sc, data* data) {
     /* Traverse the tree and insert as a leaf */
     node* p = sc->root;     // Parent node
     while (1){
-        switch (data_compare(data, p->data)){
-            case -1: if (p->left == NULL){
-                         p->left = n;
-                         return;
-                     }
-                     p = p->left;
-                break;
-            case  1: if (p->right == NULL){
-                         p->right = n;
-                         return;
-                     }
-                     p = p->right;
-                break;
-            default: // Node is already inside the tree
-                     node_delete(n);
-                     return;     
+        int cmp = data_compare(data, p->data);
+
+        if (cmp < 0){
+            // Insert on the left
+            if (p->left == NULL){
+                p->left = n;
+                return;
+            }
+            p = p->left;
+
+        } else if (cmp > 0){
+            // Insert on the right
+            if (p->right == NULL){
+                p->right = n;
+                return;
+            }
+            p = p->right;
+
+        } else {                
+            // Node is already inside the tree
+            node_delete(n);
+            return;     
         } 
     }
 }
