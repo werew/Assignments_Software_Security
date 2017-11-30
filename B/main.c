@@ -70,6 +70,8 @@ data* read_data(char const* command) {
     for (; isalpha((int) *p); p++); // 2) Skip command name
 
 
+
+
     /* 2. Read age: for safety reasons we favor strtol over atoi or scanf,
           since this function let us check the validity of the output  */
 
@@ -95,16 +97,16 @@ data* read_data(char const* command) {
 
     p = endptr;   // Move forward
 
-
     /* 3. Read name */
-    for (; isspace((int) *p); p++);  // Skip initial spaces (if any)
+    for (; isspace((int) *p); p++);     // Skip white-spaces (if any)
 
     unsigned int i = 0;
-    while (isalpha((int) *p)){       // We allow only letters inside a name (TODO ask if it's ok)
-
+    while (*p != '\0' && !isspace((int) *p)){ // We only allow non white-space 
+                                              // chars inside a name: this is the same 
+                                              // as the original %s, just a safer
         // Fail if the name is too long
-        if (i >= NAME_LENGTH - 1) {
-            errno = EINVAL;
+        if (i >= NAME_LENGTH - 1) { 
+            errno = EINVAL;         
             return NULL; 
         }
 
