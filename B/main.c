@@ -236,6 +236,10 @@ error_handler:
  *   by only changing TWO lines in total. TODO there are more than 2, ask
  *
  * BUGS FIXED:
+ *  - NULL pointer dereferencing:
+ *      the pointer to the memory allocated by `malloc` despited the
+ *      possibility that `malloc` could have returned a NULL pointer
+ *
  *  - Invalid reads/writes on the heap:
  *      the pointer inputAt was not appropriately updated after reallocating
  *      the buffer.
@@ -262,7 +266,10 @@ char* read_command(FILE* in) {
     int incr = INPUT_INCREMENT;
 
     inputMaxLength = incr;
-    input = (char*)malloc(sizeof(char) * incr);         // TODO if input is NULL
+
+    input = (char*)malloc(sizeof(char) * incr);         
+    if (input == NULL) return NULL;
+
     inputAt = input;
     do {
         inputAt[incr - 1] = 'e';
