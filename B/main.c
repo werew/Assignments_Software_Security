@@ -48,19 +48,16 @@ void print_prompt(FILE* f) {
  *     a big (or too small negative) age could have lead to an integer overflow
  *     (or underflow respectively. This could have resulted in unintended behaviour.
  *
- * OBSERVATIONS:
+ * - Negative ages were allowed:
+ *      ages are by their nature always positives, on the other hand the
+ *      program was accepting also negative ages. 
  *
- * - Negative ages are allowed:
- *      ages are by their nature always positives, on the other hand the program
- *      accepts also negative ages. Given that in the type `data` the field age
- *      is defined as a signed integer (and we were told not to modify type 
- *      definitions) we suppose that this is indeed an intended behaviour.
+ * OBSERVATIONS:
  *
  * - Return value could be NULL:
  *      `data_new` could return a NULL pointer (in case of failure of malloc),
  *      therefore `read_data` could also return NULL but this behaviour was not
- *      documented in the specifications
- *
+ *      documented in the specifications.
  */
 data* read_data(char const* command) {
     /* Some declarations */
@@ -86,6 +83,8 @@ data* read_data(char const* command) {
     // Check for invalid age
     if ((errno == ERANGE && (age == LONG_MAX || age == LONG_MIN)) ||
         (errno != 0 && age == 0)) return NULL;
+
+    if (age < 0) return NULL;
 
     // Check if age was found
     if (endptr == p){
