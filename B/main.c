@@ -240,9 +240,19 @@ error_handler:
  *      the pointer inputAt was not appropriately updated after reallocating
  *      the buffer.
  *
- *  - Invalid write on the stack (off-by-one bug):
- *      an input starting with a zero byte will cause
- *      a write one byte out of the input buffer 
+ *  - Invalid write on the heap (off-by-one style bug):
+ *      an input starting with a zero byte will cause a write one byte out of
+ *      the input buffer (precisely at input[-1])
+ * 
+ *  - Command compromised if EOF is read:
+ *      after the command was read the character previous to the last was
+ *      always removed (substituted with '\0'). Since `fgets` stops reading
+ *      after a newline we believe that the intention of the programmer were
+ *      to remove the trailing newline from the command, on the other hand
+ *      this was not always the case. Indeed `fgets` could have finished
+ *      reading whiteout encountering a newline (in case of EOF), in that
+ *      particular case the last character of the command given by the user
+ *      would have been compromised.
  */
 char* read_command(FILE* in) {
     int inputMaxLength = 0;
@@ -263,9 +273,13 @@ char* read_command(FILE* in) {
         inputMaxLength += INPUT_INCREMENT;
         input = realloc(input, sizeof(char) * inputMaxLength);  // TODO if return NULL, memory leak
         inputAt = input + inputMaxLength - INPUT_INCREMENT - 1;
-        incr = INPUT_INCREMENT + 1;
+        incr = INPUT_INCREMENT + 1; // TODO overflow
     } while(1);
-    input[strlen(input) == 0 ? 0 : strlen(input)-1] = 0; // TODO error if empty string
+
+    // Remove trailing newline character (if any)
+    size_t len = strlen(input);
+    if (len > 0 && input[len-1] == '\n') input[len-1] = 0; 
+
     return input;
 }
 
