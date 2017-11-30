@@ -352,12 +352,17 @@ char* read_command(FILE* in) {
  * BUGS FIXED:
  *  - Memory leak:
  *      the memory allocated by read_command was never freed    
+ *
+ *  - NULL pointer dereferencing:
+ *      the result of `sortedcontainer_new` (which could be
+ *      a NULL pointer in case of error) was not checked.
  */
 int main(int argc, char* argv[]) {
     (void)argc;
     (void)argv;
 
-    sortedcontainer* sc = sortedcontainer_new(); // TODO check if NULL
+    sortedcontainer* sc = sortedcontainer_new();
+    if (sc == NULL) return EXIT_FAILURE;
 
     while(1) {
         print_prompt(stdout);
