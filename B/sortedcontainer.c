@@ -54,9 +54,16 @@ void node_delete(node* n) {
     free(n);
 }
 
+
+/**
+ * BUGS FIXED:
+ *  - NULL pointer dereferencing:
+ *      no check was performed against the return value of malloc
+ */
 sortedcontainer* sortedcontainer_new() {
-    sortedcontainer* d = (sortedcontainer*)malloc(sizeof(sortedcontainer)); //TODO check return
-    d->root = NULL; //TODO potential NULL pointer dereferencing
+    sortedcontainer* d = (sortedcontainer*)malloc(sizeof(sortedcontainer));
+    if (d == NULL) return NULL;
+    d->root = NULL; 
     return d;
 }
 
