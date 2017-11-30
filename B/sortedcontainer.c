@@ -18,8 +18,15 @@ void data_print(data* d, FILE* f) {
     fprintf(f, "%i %s", d->age, d->name);
 }
 
+
+/**
+ * BUGS FIXED:
+ * - NULL pointer dereferencing:
+ *      no check on the return value of malloc was performed
+ */      
 data* data_new(int age, char const* name) {
-    data* d = (data*)malloc(sizeof(data));  // TODO if NULL
+    data* d = (data*)malloc(sizeof(data));  
+    if (d == NULL) return NULL;
     d->age = age;
     strncpy(d->name, name, NAME_LENGTH);
     return d;
@@ -53,6 +60,8 @@ sortedcontainer* sortedcontainer_new() {
     return d;
 }
 
+
+// TODO return in case of error
 void sortedcontainer_insert(sortedcontainer* sc, data* data) {
 
     /* Create new node */
@@ -200,6 +209,6 @@ static void node_deletetree(node* n) {
 }
 
 void sortedcontainer_delete(sortedcontainer* sc) {
-    node_deletetree(sc->root);
+    node_deletetree(sc->root); 
     free(sc);
 }
