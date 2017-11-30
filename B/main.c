@@ -14,9 +14,14 @@
 /**
  * @brief Prints the prompt to @c f
  * @param f The FILE to print the prompt to.
+ *
+ * OBSERVATIONS:
+ *  - Uncaught IO errors:
+ *    this function doesn't performs any check and/or gives
+ *    any feedback if an output error is encountered (eg. closed stream).
  */
 void print_prompt(FILE* f) {
-    fprintf(f, "\n> "); fflush(f); //TODO uncaught IO errors (maybe explain why we don't consired it harmful)
+    fprintf(f, "\n> "); fflush(f); 
 }
 
 /**
