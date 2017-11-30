@@ -133,12 +133,6 @@ data* read_data(char const* command) {
 
     for (; isspace((int) *p); p++);  // Skip trailing spaces (if any)
    
-    // Fail if the command contains unnecessary extra arguments (TODO ask) 
-    if (*p != '\0'){
-        errno = EINVAL;
-        return NULL;
-    }
-
     
     /* 4. Create and return new data struct */
     return data_new((int) age, name);
