@@ -4,12 +4,36 @@
 #include <errno.h>
 #include <ctype.h>
 #include <limits.h>
+#include <assert.h> /// TODO remove
 
 #include "sortedcontainer.h"
 #include "test.h"
 
 // DO NOT change this value. It does not fix your problems
 #define INPUT_INCREMENT 10
+
+
+
+
+//// TODO REMOVE 
+static int node_issortedtree(node* n, data* min, data* max) {
+    if(n == NULL) return 1;
+
+    if(min && data_compare(n->data, min) < 0) return 0;
+    if(max && data_compare(max, n->data) < 0) return 0;
+
+    return node_issortedtree(n->left, min, n->data) && node_issortedtree(n->right, n->data, max);
+}
+
+//// TODO REMOVE
+int sortedcontainer_issorted(sortedcontainer* sc) {
+    return node_issortedtree(sc->root, NULL, NULL);
+}
+
+
+
+
+
 
 /**
  * @brief Prints the prompt to @c f
@@ -367,6 +391,9 @@ int main(int argc, char* argv[]) {
             free(command);
             break;
         }
+        
+        
+        assert(sortedcontainer_issorted(sc)); ///// TODO REMOVE
 
         free(command);
     }
