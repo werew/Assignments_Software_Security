@@ -131,7 +131,7 @@ data* read_data(char const* command) {
     unsigned int i = 0;
     while (*p != '\0' && !isspace((int) *p)){ // We only allow non white-space 
                                               // chars inside a name: this is the same 
-                                              // as the original %s, just a safer
+                                              // as the original %s, just safer
         // Fail if the name is too long
         if (i >= NAME_LENGTH - 1) { 
             errno = EINVAL;         
@@ -307,6 +307,7 @@ char* read_command(FILE* in) {
     size_t inputMaxLength = 0;      // Type changed from int to size_t to avoid overflows
     char* input = NULL;
     char* inputAt = NULL;     
+    char* tmp = NULL;               // Temporary pointer where to store realloc's result
 
     unsigned int incr = INPUT_INCREMENT;
 
