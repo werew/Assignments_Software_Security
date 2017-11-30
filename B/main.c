@@ -210,12 +210,7 @@ error_handler:
        can be found in many famous projects as for example: 
        linux, apache, valgind, etc..)                           */
        
-    if (errno == ERANGE || errno == EINVAL){
-        fprintf(printFile,"Invalid input\n");
-    } else {
-        fprintf(printFile, "%s", strerror(errno)); 
-    }
-
+    fprintf(printFile,"Invalid input\n");
     return 0;
 }
 
