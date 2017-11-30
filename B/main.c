@@ -236,13 +236,21 @@ error_handler:
  *   by only changing TWO lines in total. TODO there are more than 2, ask
  *
  * BUGS FIXED:
- *  - NULL pointer dereferencing:
- *      the pointer to the memory allocated by `malloc` despited the
- *      possibility that `malloc` could have returned a NULL pointer
+ *  - NULL pointer dereferencing (1):
+ *      the pointer to the memory allocated by `malloc` is always used despite
+ *      the possibility that `malloc` could have returned a NULL pointer
  *
  *  - Memory leak if EOF is encountered:
  *      in case of `fgets` returning NULL the memory previously allocated
  *      for the input buffer was completely lost.
+ *
+ *  - Memory leak if `realloc` fails:
+ *      in case of `realloc` returning NULL the memory previously allocated
+ *      for the input buffer was completely lost.
+ *
+ *  - NULL pointer dereferencing (2):
+ *      the pointer to the memory allocated by `realloc` is always used despite
+ *      the possibility that `realloc` could have returned a NULL pointer
  *
  *  - Invalid reads/writes on the heap:
  *      the pointer inputAt was not appropriately updated after reallocating
@@ -289,7 +297,14 @@ char* read_command(FILE* in) {
             break;
         }
         inputMaxLength += INPUT_INCREMENT;
-        input = realloc(input, sizeof(char) * inputMaxLength);  // TODO if return NULL, memory leak
+
+        tmp = realloc(input, sizeof(char) * inputMaxLength);
+        if (tmp == NULL){
+            free(input);
+            return NULL;
+        }
+
+        input = tmp;
         inputAt = input + inputMaxLength - INPUT_INCREMENT - 1;
         incr = INPUT_INCREMENT + 1; // TODO overflow
     } while(1);
