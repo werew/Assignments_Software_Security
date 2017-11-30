@@ -209,7 +209,10 @@ error_handler:
        to directly jump to an error handler when needed (such practice
        can be found in many famous projects as for example: 
        linux, apache, valgind, etc..)                           */
-       
+
+    // Here we could have checked the value of errno and print a
+    // different message in each case. But for reason of compatibility
+    // with the project requirements we always print "Invalid input"       
     fprintf(printFile,"Invalid input\n");
     return 0;
 }
