@@ -240,6 +240,10 @@ error_handler:
  *      the pointer to the memory allocated by `malloc` despited the
  *      possibility that `malloc` could have returned a NULL pointer
  *
+ *  - Memory leak if EOF is encountered:
+ *      in case of `fgets` returning NULL the memory previously allocated
+ *      for the input buffer was completely lost.
+ *
  *  - Invalid reads/writes on the heap:
  *      the pointer inputAt was not appropriately updated after reallocating
  *      the buffer.
@@ -273,7 +277,14 @@ char* read_command(FILE* in) {
     inputAt = input;
     do {
         inputAt[incr - 1] = 'e';
-        if(fgets(inputAt, incr, in) == NULL) return NULL;   // TODO memory leak if NULL (input lost)
+
+        // TODO what if <0 
+        // TODO what if NULL after
+        if(fgets(inputAt, incr, in) == NULL){
+            free(input);
+            return NULL; 
+        }
+
         if(inputAt[incr - 1] != '\0' || inputAt[incr - 2] == '\n') {
             break;
         }
