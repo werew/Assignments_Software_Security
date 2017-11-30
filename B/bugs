@@ -138,3 +138,6 @@ main.c:70         fprintf(printFile, command); cc1: all warnings being treated a
 ==14455== For counts of detected and suppressed errors, rerun with: -v
 ==14455== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
 
+
+## TODO insert a list of bugs found manually
+
