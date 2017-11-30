@@ -244,6 +244,16 @@ error_handler:
  *      in case of `fgets` returning NULL the memory previously allocated
  *      for the input buffer was completely lost.
  *
+ *  - Integer overflow:
+ *      `inputMaxLength` could have been overflowed by providing large enough
+ *      input. This bug could have been used to produce an heap-based buffer 
+ *      overflow, it was therefore very critic from a security standpoint.
+ *
+ *  - Unlimited amount of bytes read:
+ *      the absence of a limit regarding the final size of `input` could have
+ *      been used to produce a memory shortage in the system which could have
+ *      critical security implication in some cases (eg. in case of a server).
+ *
  *  - Memory leak if `realloc` fails:
  *      in case of `realloc` returning NULL the memory previously allocated
  *      for the input buffer was completely lost.
@@ -272,11 +282,15 @@ error_handler:
  */
 char* read_command(FILE* in) {
 
-    int inputMaxLength = 0;
+    // We introduce a size limit in order to avoid memory usages abuses and
+    // integer overflows
+    #define INPUT_SIZE_LIMIT 512    
+
+    size_t inputMaxLength = 0;      // Type changed from int to size_t to avoid overflows
     char* input = NULL;
     char* inputAt = NULL;     
 
-    int incr = INPUT_INCREMENT;
+    unsigned int incr = INPUT_INCREMENT;
 
     inputMaxLength = incr;
 
@@ -298,7 +312,13 @@ char* read_command(FILE* in) {
 
         if(inputAt[incr - 1] != '\0' || inputAt[incr - 2] == '\n') break;
 
+        // Update buffer size imposing a size limit in order to prevent
+        // integer overflows and abusing memory usage
         inputMaxLength += INPUT_INCREMENT;
+        if (inputMaxLength > INPUT_SIZE_LIMIT){
+            free(input);
+            return NULL;
+        }
 
         // Increase size buffer
         tmp = realloc(input, sizeof(char) * inputMaxLength);
@@ -310,7 +330,7 @@ char* read_command(FILE* in) {
 
         // Update end of input pointer and size to read
         inputAt = input + inputMaxLength - INPUT_INCREMENT - 1;
-        incr = INPUT_INCREMENT + 1; // TODO overflow
+        incr = INPUT_INCREMENT + 1; 
     } while(1);
 
     // Remove trailing newline character (if any)
