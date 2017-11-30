@@ -68,7 +68,13 @@ sortedcontainer* sortedcontainer_new() {
 }
 
 
-// TODO return in case of error
+/**
+ * OBSERVATIONS:
+ *  - Missing return value:
+ *      this function doesn't provide any feedback about whether the insertion
+ *      has been successful or not, which in a real application could pose
+ *      serious usability concerns
+ */
 void sortedcontainer_insert(sortedcontainer* sc, data* data) {
 
     /* Create new node */
