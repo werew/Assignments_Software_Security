@@ -271,9 +271,10 @@ error_handler:
  *      would have been compromised.
  */
 char* read_command(FILE* in) {
+
     int inputMaxLength = 0;
     char* input = NULL;
-    char* inputAt = NULL;
+    char* inputAt = NULL;     
 
     int incr = INPUT_INCREMENT;
 
@@ -284,6 +285,8 @@ char* read_command(FILE* in) {
 
     inputAt = input;
     do {
+        // Initialize last character. This is used later to check
+        // if `fgets` puts a '\0' here
         inputAt[incr - 1] = 'e';
 
         // TODO what if <0 
@@ -293,18 +296,19 @@ char* read_command(FILE* in) {
             return NULL; 
         }
 
-        if(inputAt[incr - 1] != '\0' || inputAt[incr - 2] == '\n') {
-            break;
-        }
+        if(inputAt[incr - 1] != '\0' || inputAt[incr - 2] == '\n') break;
+
         inputMaxLength += INPUT_INCREMENT;
 
+        // Increase size buffer
         tmp = realloc(input, sizeof(char) * inputMaxLength);
-        if (tmp == NULL){
+        if (tmp == NULL){ // Always check if we are out of memory
             free(input);
             return NULL;
         }
-
         input = tmp;
+
+        // Update end of input pointer and size to read
         inputAt = input + inputMaxLength - INPUT_INCREMENT - 1;
         incr = INPUT_INCREMENT + 1; // TODO overflow
     } while(1);
