@@ -244,7 +244,7 @@ error_handler:
  *      an input starting with a zero byte will cause a write one byte out of
  *      the input buffer (precisely at input[-1])
  * 
- *  - Command compromised if EOF is read:
+ *  - Command compromised if EOF is encountered while reading:
  *      after the command was read the character previous to the last was
  *      always removed (substituted with '\0'). Since `fgets` stops reading
  *      after a newline we believe that the intention of the programmer were
