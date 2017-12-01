@@ -93,7 +93,7 @@ data* read_data(char const* command) {
 
     /* 1. Skip command name */
     for (; isspace((int) *p); p++); // 1) Skip initial spaces (if any)
-    for (; isalpha((int) *p); p++); // 2) Skip command name
+    for (; isalpha((int) *p); p++); // 2) Skip command name (XXX maybe skip only one char?)
 
 
     /* 2. Read age: for safety reasons we favor strtol over atoi or scanf,
