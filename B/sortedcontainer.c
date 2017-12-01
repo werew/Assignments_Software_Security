@@ -5,12 +5,28 @@
 
 #include "sortedcontainer.h"
 
+
+/**
+ * BUGS FIXED:
+ *  - Specification mismatch:
+ *      the specifications indicate that this function would return
+ *      always -1 if d1 < d2, 1 if d2 > d1 and 0 otherwise. On the
+ *      other hand this was not always the case given that strcmp
+ *      could possibly return other values.
+ */
 int data_compare(data* d1, data* d2) {
     assert(d1);
     assert(d2);
+   
+    // Age has the priority 
     if(d1->age < d2->age) return -1;
     if(d1->age > d2->age) return 1;
-    return strcmp(d1->name, d2->name);
+
+    // ...and then we compare the name
+    int cmp = strcmp(d1->name, d2->name);
+    if (cmp < 0) return -1;
+    if (cmp > 0) return  1;
+    return 0;
 }
 
 // Do not change
@@ -95,7 +111,7 @@ void sortedcontainer_insert(sortedcontainer* sc, data* data) {
     while (1){
         int cmp = data_compare(data, p->data);
 
-        if (cmp < 0){
+        if (cmp < 0){ // TODO do the same for the others
             // Insert on the left
             if (p->left == NULL){
                 p->left = n;
