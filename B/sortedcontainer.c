@@ -111,7 +111,7 @@ void sortedcontainer_insert(sortedcontainer* sc, data* data) {
     while (1){
         int cmp = data_compare(data, p->data);
 
-        if (cmp < 0){ // TODO do the same for the others
+        if (cmp < 0){
             // Insert on the left
             if (p->left == NULL){
                 p->left = n;
@@ -181,18 +181,22 @@ int sortedcontainer_erase(sortedcontainer* sc, data* data) {
     node* p = NULL;     // Parent node
 
     while (n != NULL){
-        switch (data_compare(data, n->data)){
-            case -1: p = n;
-                     n = n->left; 
-                break;
-            case  1: p = n;
-                     n = n->right;
-                break;
-            default: // Delete node
-                     _node_removal(sc,p,n);                 
-                     return 1;
-                break;
-        } 
+        int cmp = data_compare(data, n->data);
+    
+        if (cmp < 0) {
+            p = n;
+            n = n->left; 
+
+        } else if (cmp > 0) {
+            p = n;
+            n = n->right;
+
+        } else {
+            // Delete node
+            _node_removal(sc,p,n);
+            return 1;
+        }
+        
     }
     
     // Node not found
@@ -203,15 +207,21 @@ int sortedcontainer_contains(sortedcontainer* sc, data* data) {
     node* n = sc->root;
 
     while (n != NULL){
-        switch (data_compare(data, n->data)){
-            case -1: n = n->left;
-                break;
-            case  1: n = n->right;
-                break;
-            default: return 1;
+        int cmp = data_compare(data, n->data);
+
+        if (cmp < 0){
+            n = n->left;
+
+        } else if (cmp > 0){
+            n = n->right;
+
+        } else {
+            // Node found !
+            return 1;
         } 
     }
 
+    // Node not found 
     return 0;
 }
 
