@@ -149,9 +149,6 @@ data* read_data(char const* command) {
         return NULL;
     }
 
-    for (; isspace((int) *p); p++);  // Skip trailing spaces (if any)
-   
-    
     /* 4. Create and return new data struct */
     return data_new((int) age, name);
 }
