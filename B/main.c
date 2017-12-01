@@ -96,52 +96,46 @@ data* read_data(char const* command) {
     for (; isalpha((int) *p); p++); // 2) Skip command name
 
 
-
-
     /* 2. Read age: for safety reasons we favor strtol over atoi or scanf,
           since this function let us check the validity of the output  */
-
     errno = 0;                      // So we can distinguish success/failure after call
     age = strtol(p, &endptr, 0);
 
-    // Check for invalid age
-    if ((errno == ERANGE && (age == LONG_MAX || age == LONG_MIN)) ||
-        (errno != 0 && age == 0)) return NULL;
+    // Check for errors
+    if (errno != 0 ) return NULL;
 
-    if (age < 0) return NULL;
-
-    // Check if age was found
-    if (endptr == p){
-        errno = EINVAL;
+    // Check for valid age (make sure age is a valid positive int)
+    if (age > INT_MAX || age < 0){
+        errno = ERANGE;
         return NULL;
     }
 
-    // Check for int overflow/underflow 
-    // (we make sure that age is a valid int before the cast)
-    if (age > INT_MAX || age < INT_MIN){
-        errno = ERANGE;
+    // Check if age was found (XXX should we move this test before?)
+    if (endptr == p){
+        errno = EINVAL;
         return NULL;
     }
 
     p = endptr;   // Move forward
 
     /* 3. Read name */
-    for (; isspace((int) *p); p++);     // Skip white-spaces (if any)
+    for (; isspace((int) *p); p++);    // Skip white-spaces (if any)
 
+    // We only allow non white-space chars inside a name
+    // (this is the same as the original %s, just safer)
     unsigned int i = 0;
-    while (*p != '\0' && !isspace((int) *p)){ // We only allow non white-space 
-                                              // chars inside a name: this is the same 
-                                              // as the original %s, just safer
+    while (*p != '\0' && !isspace((int) *p)){ 
+                                              
         // Fail if the name is too long
         if (i >= NAME_LENGTH - 1) { 
             errno = EINVAL;         
             return NULL; 
         }
 
-        name[i++] = *p++;            // Copy character 
+        name[i++] = *p++;              // Copy character 
     }
 
-    name[i] = '\0';                  // Null-terminate string
+    name[i] = '\0';                    // Null-terminate string
     
     // Fail if name was not found
     if (i == 0){
