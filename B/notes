@@ -1,2 +1,16 @@
 Use iterative algorithms in order to avoid stack overflows
 --- Double check specs at the end
+For ease of correction and in order to show that the bugs were understood 
+the list of bugs found on top of each function
+this is particulary true for the function `read_data` which, in order to 
+avoid the unsafe behaviour of `sscanf` when parsing numeric values, has been
+almost completely reimplemented (using the safest function `strtol` in order
+to parse the user provided integer).
+
+
+(It is not enough to reimplement the function and thus not showing you understand the bugs)
+
+The behaviour has been respected
+
+
+//TODO add tests
