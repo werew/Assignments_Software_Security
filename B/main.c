@@ -238,16 +238,15 @@ int handle_command(FILE* printFile, sortedcontainer* sc, const char* command) {
     return 0;
 
 error_handler: 
-    /* XXX IMPORTANT: Please don't be mad for this `goto`.
+    /* XXX: 
        While most C purists think `goto` statements should never be 
        used, we think that a responsible use of `goto` can help
-       code's readability (we don't like spaghetti code too). 
+       code's readability (I don't like spaghetti code too). 
        One of C programmers most common practices is to use `goto` 
        to directly jump to an error handler when needed (such practice
        can be found in many famous projects as for example: 
        linux, apache, valgind, etc..)                           */
 
-    // TODO fun call ?
     // Here we could have checked the value of errno and print a
     // different message in each case. But for reason of compatibility
     // with the project requirements we always print "Invalid input"       
