@@ -1,0 +1,160 @@
+###################################################################################
+#                                                                                 #
+# This file contains a list of the bugs that have been found using external       # 
+# tools. For each bug the name of the tool used, command line option and the      #
+# tool's output are reported.  In some cases, the input which produced the        #
+# error is also given. Findings are ordered chronologically.                      #
+#                                                                                 #
+###################################################################################
+
+
+############### Bugs found at compilation (gcc -Wall) ######
+##### gcc -std=c99 -Wall -Werror -pedantic -Wextra -g -O0
+
+# Format string bug
+main.c:70         fprintf(printFile, command); cc1: all warnings being treated as errors
+
+
+
+
+############### Bugs found using cppcheck ##################
+##### ccpcheck --enable=all *.c *.h
+
+# Buffer overflow
+[main.c:40]: (portability) scanf without field width limits can crash with huge input data on some versions of libc.
+[main.c:40]: (warning) scanf without field width limits can crash with huge input data.
+
+
+
+
+############### Bugs found using valgrind ##################
+#### valgrind --leak-check=full  --show-leak-kinds=all --track-origins=yes ./sint
+
+
+#### with input: t,x
+# Memory leak: the memory allocated by read_command was never released 
+==9963== HEAP SUMMARY:
+==9963==     in use at exit: 20 bytes in 2 blocks
+==9963==   total heap usage: 59 allocs, 57 frees, 1,276 bytes allocated
+==9963==
+==9963== 20 bytes in 2 blocks are definitely lost in loss record 1 of 1
+==9963==    at 0x4C2AB80: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==9963==    by 0x40166A: read_command (main.c:202)
+==9963==    by 0x40176C: main (main.c:237)
+==9963==
+==9963== LEAK SUMMARY:
+==9963==    definitely lost: 20 bytes in 2 blocks
+==9963==    indirectly lost: 0 bytes in 0 blocks
+==9963==      possibly lost: 0 bytes in 0 blocks
+==9963==    still reachable: 0 bytes in 0 blocks
+==9963==         suppressed: 0 bytes in 0 blocks
+==9963==
+==9963== For counts of detected and suppressed errors, rerun with: -v
+==9963== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+
+
+#### with input: i 12 abcd
+# The pointer inputAt in read_command is not update appropriately after realloc of buffer input
+==12654== Invalid write of size 1
+==12654==    at 0x4016D7: read_command (main.c:205)
+==12654==    by 0x4017C8: main (main.c:239)
+==12654==  Address 0x55060a3 is 9 bytes after a block of size 10 free'd
+==12654==    at 0x4C2CE8E: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==12654==    by 0x401744: read_command (main.c:211)
+==12654==    by 0x4017C8: main (main.c:239)
+==12654==
+==12654== Invalid write of size 1
+==12654==    at 0x4C2FD48: __GI_memcpy (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==12654==    by 0x51AC2E3: _IO_getline_info (iogetline.c:105)
+==12654==    by 0x51AB205: fgets (iofgets.c:56)
+==12654==    by 0x4016EE: read_command (main.c:206)
+==12654==    by 0x4017C8: main (main.c:239)
+==12654==  Address 0x5506099 is 9 bytes inside a block of size 10 free'd
+==12654==    at 0x4C2CE8E: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==12654==    by 0x401744: read_command (main.c:211)
+==12654==    by 0x4017C8: main (main.c:239)
+==12654==
+==12654== Invalid write of size 1
+==12654==    at 0x51AB272: fgets (iofgets.c:64)
+==12654==    by 0x4016EE: read_command (main.c:206)
+==12654==    by 0x4017C8: main (main.c:239)
+==12654==  Address 0x550609a is 0 bytes after a block of size 10 free'd
+==12654==    at 0x4C2CE8E: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==12654==    by 0x401744: read_command (main.c:211)
+==12654==    by 0x4017C8: main (main.c:239)
+==12654==
+==12654== Invalid read of size 1
+==12654==    at 0x40170E: read_command (main.c:207)
+==12654==    by 0x4017C8: main (main.c:239)
+==12654==  Address 0x55060a3 is 9 bytes after a block of size 10 free'd
+==12654==    at 0x4C2CE8E: realloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==12654==    by 0x401744: read_command (main.c:211)
+==12654==    by 0x4017C8: main (main.c:239)
+==12654==
+
+
+### with input: i 1,p
+# The value returned by read_data was used without any check
+==12839== Invalid read of size 4
+==12839==    at 0x400C04: data_print (sortedcontainer.c:18)
+==12839==    by 0x4010DE: node_printtree (sortedcontainer.c:177)
+==12839==    by 0x40116E: sortedcontainer_print (sortedcontainer.c:188)
+==12839==    by 0x4015C8: handle_command (main.c:167)
+==12839==    by 0x40179A: main (main.c:248)
+==12839==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+==12839==
+==12839==
+==12839== Process terminating with default action of signal 11 (SIGSEGV)
+==12839==  Access not within mapped region at address 0x0
+==12839==    at 0x400C04: data_print (sortedcontainer.c:18)
+==12839==    by 0x4010DE: node_printtree (sortedcontainer.c:177)
+==12839==    by 0x40116E: sortedcontainer_print (sortedcontainer.c:188)
+==12839==    by 0x4015C8: handle_command (main.c:167)
+==12839==    by 0x40179A: main (main.c:248)
+==12839==  If you believe this happened as a result of a stack
+==12839==  overflow in your program's main thread (unlikely but
+==12839==  possible), you can try to increase the size of the
+==12839==  main thread stack using the --main-stacksize= flag.
+==12839==  The main thread stack size used in this run was 8388608.
+ ==12839==
+==12839== HEAP SUMMARY:
+==12839==     in use at exit: 42 bytes in 3 blocks
+==12839==   total heap usage: 4 allocs, 1 frees, 52 bytes allocated
+==12839==
+==12839== LEAK SUMMARY:
+==12839==    definitely lost: 0 bytes in 0 blocks
+==12839==    indirectly lost: 0 bytes in 0 blocks
+==12839==      possibly lost: 0 bytes in 0 blocks
+==12839==    still reachable: 42 bytes in 3 blocks
+==12839==         suppressed: 0 bytes in 0 blocks
+==12839== Rerun with --leak-check=full to see details of leaked memory
+==12839==
+==12839== For counts of detected and suppressed errors, rerun with: -v
+==12839== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+
+
+### with input: i 5 a, i 2 a, i 7 a, e 7 a, x
+# In handle_command the data structure passed to sortedcontainer_erase was not
+# properly freed afterward (as sortedcontainer_erase does not claim ownership)
+# NB: same thing was happening with sortedcontainer_contains
+==14455==
+==14455== HEAP SUMMARY:
+==14455==     in use at exit: 24 bytes in 1 blocks
+==14455==   total heap usage: 13 allocs, 12 frees, 226 bytes allocated
+==14455==
+==14455== 24 bytes in 1 blocks are definitely lost in loss record 1 of 1
+==14455==    at 0x4C2AB80: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14455==    by 0x400D56: data_new (sortedcontainer.c:22)
+==14455==    by 0x401644: read_data (main.c:138)
+==14455==    by 0x4016DD: handle_command (main.c:172)
+==14455==    by 0x4019B6: main (main.c:283)
+==14455==
+==14455== LEAK SUMMARY:
+==14455==    definitely lost: 24 bytes in 1 blocks
+==14455==    indirectly lost: 0 bytes in 0 blocks
+==14455==      possibly lost: 0 bytes in 0 blocks
+==14455==    still reachable: 0 bytes in 0 blocks
+==14455==         suppressed: 0 bytes in 0 blocks
+==14455==
+==14455== For counts of detected and suppressed errors, rerun with: -v
+==14455== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
