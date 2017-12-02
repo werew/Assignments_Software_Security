@@ -102,7 +102,7 @@ void print_prompt(FILE* f) {
  * - Return value could be NULL:
  *      `data_new` could return a NULL pointer (in case of failure of malloc),
  *      therefore `read_data` could also return NULL but this behaviour was not
- *      documented in the specifications.
+ *      documented in the specifications. I updated the specifications.
  */
 data* read_data(char const* command) {
     /* Some declarations */
