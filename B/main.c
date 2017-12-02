@@ -76,7 +76,28 @@ void print_prompt(FILE* f) {
  *      ages are by their nature always positives, on the other hand the
  *      program was accepting also negative ages. 
  *
+ * - `sscanf` is not a robust function:
+ *      the original version made use of the function `sscanf` to parse
+ *      the command and with it the integer representing the age. However
+ *      format strings are not the safest solution when parsing user provided
+ *      integers values. For instance if a letter is entered instead of an
+ *      integer number the program would not complain but just take the wrong
+ *      integer.  Furthermore `sscanf` doesn't handle integer overflows so it's
+ *      not reliable when dealing with user input.
+ *
  * OBSERVATIONS:
+ *
+ * - Honoring the original behaviour:
+ *      after asking to the teacher it was agreed that it would be preferable
+ *      to honour the behaviour of the original version of this function
+ *      instead of modifying the set of commands accepted. Therefore this
+ *      function considers as valid all the commands that would have been
+ *      successfully read by the original `sscanf` invocation:
+ *      `sscanf(command, "%*s %i %s", &age, name)`, and handles them in a more
+ *      robust way.  In particular please consider that %s matches any sequence
+ *      of non-white-space characters that %i would read hexadecimal values as
+ *      well as octals and decimals. Also the spaces in the format string would
+ *      match any amount of white-space characters, including none.
  *
  * - Return value could be NULL:
  *      `data_new` could return a NULL pointer (in case of failure of malloc),
@@ -92,8 +113,7 @@ data* read_data(char const* command) {
 
 
     /* 1. Skip command name */
-    for (; isspace((int) *p); p++); // 1) Skip initial spaces (if any)
-    for (; isalpha((int) *p); p++); // 2) Skip command name (XXX maybe skip only one char?)
+    for (; *p != '\0' && !isspace((int) *p); p++); 
 
 
     /* 2. Read age: for safety reasons we favor strtol over atoi or scanf,
@@ -110,7 +130,7 @@ data* read_data(char const* command) {
         return NULL;
     }
 
-    // Check if age was found (XXX should we move this test before?)
+    // Check if age was found 
     if (endptr == p){
         errno = EINVAL;
         return NULL;
@@ -131,7 +151,6 @@ data* read_data(char const* command) {
             errno = EINVAL;         
             return NULL; 
         }
-
         name[i++] = *p++;              // Copy character 
     }
 
@@ -152,6 +171,9 @@ data* read_data(char const* command) {
     /* 4. Create and return new data struct */
     return data_new((int) age, name);
 }
+
+
+
 
 /**
  * @brief Handles @c command
@@ -225,6 +247,7 @@ error_handler:
        can be found in many famous projects as for example: 
        linux, apache, valgind, etc..)                           */
 
+    // TODO fun call ?
     // Here we could have checked the value of errno and print a
     // different message in each case. But for reason of compatibility
     // with the project requirements we always print "Invalid input"       
