@@ -7,7 +7,7 @@ fi
 
 test_dir="${script_dir}/tests"
 
-for f in "${test_dir}/*.expect"; do
+for f in ${test_dir}/*.expect; do
   $f;
 done;
 
