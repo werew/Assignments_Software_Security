@@ -1,0 +1,88 @@
+#!/usr/bin/expect
+
+set timeout 2
+
+spawn "valgrind" -v --track-origins=yes --leak-check=full --log-fd=1 ./sint
+
+expect {
+    timeout { send_user "\nERROR: Expected prompt.\n"; exit 1; }
+    "> "
+}
+
+
+## Trying an invalid command 
+send "bad command\n"
+expect {
+    timeout { send_user "\nERROR: expected \"No such command\".\n"; exit 1; }
+    "No such command: bad command"
+}
+
+## Trying valid command with bad argument
+send "i bad argument\n"
+expect {
+    timeout { send_user "\nERROR: expected \"Invalid input\".\n"; exit 1; }
+    "Invalid input"
+}
+
+## Make sure nothing was added
+send "p\n"
+expect {
+    "(nil)" {}
+    timeout { send_user "\nERROR: Did not get (nil) \n"; exit 1; }
+}
+
+## Add various elements
+send "i 5 aa\n"
+send "i 2 ka\n"
+send "i 3 aj\n"
+send "i 4 aa\n"
+send "i 5 ab\n"
+expect {
+    ">" {}
+    timeout { send_user "\nERROR: Expected prompt\n"; exit 1; }
+}
+
+
+## Search elements
+send "c 5 aa\n"
+expect {
+    "y" {}
+    timeout { send_user "\nERROR: Element not found\n"; exit 1; }
+}
+
+send "c 2 ka\n"
+expect {
+    "y" {}
+    timeout { send_user "\nERROR: Element not found\n"; exit 1; }
+}
+
+
+send "c 3 aj\n"
+expect {
+    "y" {}
+    timeout { send_user "\nERROR: Element not found\n"; exit 1; }
+}
+
+send "c 4 aa\n"
+expect {
+    "y" {}
+    timeout { send_user "\nERROR: Element not found\n"; exit 1; }
+}
+
+send "c 5 ab\n"
+expect {
+    "y" {}
+    timeout { send_user "\nERROR: Element not found\n"; exit 1; }
+}
+
+
+# Search invalid element
+send "c 999 zzz\n"
+expect {
+    "n" {}
+    timeout { send_user "\nERROR: Invalid element was found\n"; exit 1; }
+}
+
+
+send "x\n"
+expect "All heap blocks were freed -- no leaks are possible"
