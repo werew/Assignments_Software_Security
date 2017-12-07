@@ -6,6 +6,7 @@ use std::io::Read;
 use std::io::BufReader;
 use std::io::Bytes;
 use std::io::Result;
+use std::collections::hash_map::HashMap;
 
 
 fn is_word_char(c: &char) -> bool {
@@ -52,20 +53,35 @@ fn read_word(it: &mut Bytes<BufReader<File>>) -> Option<Result<String>> {
 
 fn get_stats(buf: BufReader<File>){
 
+    let mut hm = HashMap::new();
+
     let mut it = buf.bytes();
     loop {
+
+        // Read one word 
         let r = match read_word(&mut it) {
-            None    => break,
-            Some(r) => r
+            Some(r) => r,
+            None    => break // EOF
         };
-   
+  
+
+        // Handle read result
         match r {
-            Ok(w)  => println!("{:?}",w),
+            Ok(w)  => {
+                // Successful read: increment counter
+                let counter = hm.entry(w.to_lowercase())
+                                .or_insert(0);
+                *counter += 1;
+            },
+
             Err(e) => {
+                // Error: quit the application
                 eprintln!("Cannot read file: {}",e.description());
                 process::exit(1);
             }
         };
+
+
     }
 }
 
