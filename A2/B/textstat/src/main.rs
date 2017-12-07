@@ -8,41 +8,65 @@ use std::io::Bytes;
 use std::io::Result;
 
 
-fn read_word(it: &mut Bytes<BufReader<File>>) -> Result<String> {
+fn is_word_char(c: &char) -> bool {
+    c.is_alphanumeric() || c.eq(&'\'')
+}
+
+
+fn read_word(it: &mut Bytes<BufReader<File>>) -> Option<Result<String>> {
+
+    let mut is_reading = false;
     let mut w = String::with_capacity(100);
+
     loop {
         // Read next byte
         let r = match it.next() {
-            Some(r) => r,
-            None =>  break, // EOF
+            Some(r) =>  r,
+            None    =>  break, // EOF
         };
 
-        // Treat IO errors
+        // Handle IO errors
         if r.is_err() { 
-            return Err(r.unwrap_err()); 
+            return Some(Err(r.unwrap_err()));
         }
 
-        w.push(r.unwrap() as char);
+        // Cast result to a char
+        let c = r.unwrap() as char;
+
+        // Skip unrelated chars
+        if is_word_char(&c) == false && 
+           is_reading       == false  { continue; }
+
+
+        // Start reading the actual word
+        is_reading = true;
+        if is_word_char(&c) { w.push(c); }
+        else { break; }
     }
 
-    println!("{}",w);
-    Ok(w)
+    if w.is_empty() { None        } 
+    else            { Some(Ok(w)) }
 }
+
 
 
 fn get_stats(buf: BufReader<File>){
 
     let mut it = buf.bytes();
-    read_word(&mut it);
-    /*
-    for r in buf.bytes() {
-        let b = r.unwrap() as char;
-        //println!("Byte: {}",std::str::from_utf8(&[b]).unwrap());
-        println!("Byte: {}",b.is_uppercase());
-
+    loop {
+        let r = match read_word(&mut it) {
+            None    => break,
+            Some(r) => r
+        };
+   
+        match r {
+            Ok(w)  => println!("{:?}",w),
+            Err(e) => {
+                eprintln!("Cannot read file: {}",e.description());
+                process::exit(1);
+            }
+        };
     }
-    */
-
 }
 
 fn main() {
