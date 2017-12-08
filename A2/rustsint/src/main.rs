@@ -3,6 +3,7 @@ mod sortedcontainer;
 use sortedcontainer::SortedContainer;
 use std::io::{self, Write};
 use std::cmp::Ordering;
+use std::fmt;
 
 
 
@@ -36,6 +37,12 @@ impl PartialOrd for Data {
                 self.name.cmp(&other.name)
             )
         )
+    }
+}
+
+impl fmt::Display for Data {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Age: {}, Name: {}", self.age, self.name)
     }
 }
 
