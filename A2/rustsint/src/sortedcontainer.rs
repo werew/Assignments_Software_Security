@@ -23,7 +23,7 @@ impl<T: Display + PartialOrd> SortedContainer<T> {
     }
 
     pub fn print(&self) {
-        self._printtree(&self.root);                
+        self._printtree(&self.root,0);
     }
 
     pub fn insert(&mut self, data: T) {
@@ -66,14 +66,13 @@ impl<T: Display + PartialOrd> SortedContainer<T> {
         }
     }
 
-    // TODO ident-depth
-    fn _printtree(&self, current: &Link<T>){
+    fn _printtree(&self, current: &Link<T>, level: usize){
         match current {
-            &None => println!("(Nil)"),
+            &None => println!("{:width$}(nil)", "", width = level),
             &Some(ref n) => {
-                println!("{}",n.data);
-                self._printtree(&n.left);
-                self._printtree(&n.right);
+                println!("{:width$}{}", "", n.data, width = level);
+                self._printtree(&n.left,level+1);
+                self._printtree(&n.right,level+1);
             }
         }
     }
