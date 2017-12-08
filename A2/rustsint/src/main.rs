@@ -19,7 +19,7 @@ enum Command {
 
 
 struct Data {
-   age: u32,
+   age: i32,    //TODO ask u32 ? 
    name: String,
 }
 
@@ -54,7 +54,13 @@ impl fmt::Display for Data {
 
 fn parse_command(input: String) -> Command {
     let command_items: Vec<&str> = input.split_whitespace().collect();
-    match (command_items[0], command_items.len()) {
+
+    // TODO ask, is this ok?
+    if command_items.is_empty() { 
+        return Command::Error("please insert a command".to_string());
+    }
+
+    match (command_items[0], command_items.len()) { 
         ("p", 1) => Command::Print,
         ("x", 1) => Command::Exit,
         ("i", 3) => {
@@ -85,7 +91,7 @@ fn parse_command(input: String) -> Command {
 
 fn main() {
 
-    let sc: SortedContainer<Data> = SortedContainer::new();
+    let mut sc: SortedContainer<Data> = SortedContainer::new();
 
     loop {
         let mut input = String::new();
@@ -96,7 +102,7 @@ fn main() {
             Ok(_) => {
                 match parse_command(input) {
                     Command::Insert{age, name} => {
-                        unimplemented!();
+                        sc.insert(Data {age: age, name: name});
                     },
                     Command::Erase{age, name} => {
                         unimplemented!();
@@ -105,7 +111,7 @@ fn main() {
                         unimplemented!();
                                         }
                     Command::Print => {
-                        unimplemented!();
+                        sc.print();
                     },
                     Command::Exit => {
                         println!("Exiting...");
