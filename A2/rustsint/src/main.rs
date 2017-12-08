@@ -2,6 +2,7 @@ mod sortedcontainer;
 
 use sortedcontainer::SortedContainer;
 use std::io::{self, Write};
+use std::cmp::Ordering;
 
 
 
@@ -20,6 +21,27 @@ struct Data {
    age: u32,
    name: String,
 }
+
+impl PartialEq for Data {
+    fn eq(&self, other: &Data) -> bool {
+        self.age  == other.age &&
+        self.name == other.name
+    }
+}
+
+impl PartialOrd for Data {
+    fn partial_cmp(&self,other: &Data) -> Option<Ordering> {
+        Some(
+            self.age.cmp(&other.age).then(
+                self.name.cmp(&other.name)
+            )
+        )
+    }
+}
+
+
+
+
 
 
 
