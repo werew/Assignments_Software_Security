@@ -10,6 +10,7 @@ struct Node<T> {
 
 
 
+// TODO ident-depth
 fn printtree<T: Display>(current: &Link<T>){
     match current {
         &None => return,
@@ -22,11 +23,13 @@ fn printtree<T: Display>(current: &Link<T>){
 }
 
 
+
+
 pub struct SortedContainer<T> {
     root: Link<T>,
 }
 
-impl<T> SortedContainer<T> {
+impl<T: Display> SortedContainer<T> {
     pub fn new() -> Self {
         SortedContainer { root: None }
     }
@@ -34,7 +37,18 @@ impl<T> SortedContainer<T> {
 
 
     pub fn print(&self) {
-                
+        self._printtree(&self.root);                
+    }
+
+    fn _printtree(&self, current: &Link<T>){
+        match current {
+            &None => return,
+            &Some(ref n) => {
+                println!("{}",n.data);
+                self._printtree(&n.left);
+                self._printtree(&n.right);
+            }
+        }
     }
 
 
