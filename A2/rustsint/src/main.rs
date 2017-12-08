@@ -1,4 +1,9 @@
+mod sortedcontainer;
+
+use sortedcontainer::SortedContainer;
 use std::io::{self, Write};
+
+
 
 #[derive(Debug)]
 enum Command {
@@ -14,26 +19,6 @@ enum Command {
 struct Data {
    age: u32,
    name: String,
-}
-
-type Link<T> = Option<Box<Node<T>>>;
-
-struct Node<T> {
-    data:  T,
-    left:  Link<T>,
-    right: Link<T>,
-}
-
-struct SortedContainer<T> {
-    root: Link<T>,
-}
-
-impl<T> SortedContainer<T> {
-    pub fn new() -> Self {
-        SortedContainer { root: None }
-    }
-
-
 }
 
 
@@ -70,6 +55,8 @@ fn parse_command(input: String) -> Command {
 }
 
 fn main() {
+
+    let sc: SortedContainer<Data> = SortedContainer::new();
 
     loop {
         let mut input = String::new();
