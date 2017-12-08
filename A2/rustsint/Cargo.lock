@@ -1,4 +1,4 @@
-[root]
+[[package]]
 name = "rustsint"
 version = "0.1.0"
 

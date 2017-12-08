@@ -10,6 +10,34 @@ enum Command {
     Error(String)
 }
 
+
+struct Data {
+   age: u32,
+   name: String,
+}
+
+type Link<T> = Option<Box<Node<T>>>;
+
+struct Node<T> {
+    data:  T,
+    left:  Link<T>,
+    right: Link<T>,
+}
+
+struct SortedContainer<T> {
+    root: Link<T>,
+}
+
+impl<T> SortedContainer<T> {
+    pub fn new() -> Self {
+        SortedContainer { root: None }
+    }
+
+
+}
+
+
+
 fn parse_command(input: String) -> Command {
     let command_items: Vec<&str> = input.split_whitespace().collect();
     match (command_items[0], command_items.len()) {
