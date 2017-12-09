@@ -108,8 +108,8 @@ fn main() {
                         unimplemented!();
                     },
                     Command::Contains{age, name} => {
-                        unimplemented!();
-                                        }
+                        println!("{}",sc.contains(Data {age: age, name: name}));
+                    },
                     Command::Print => {
                         sc.print();
                     },

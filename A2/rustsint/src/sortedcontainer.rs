@@ -57,8 +57,27 @@ impl<T: Display + PartialOrd> SortedContainer<T> {
         self.root = root;
     }
 
+    pub fn contains(&self, data: T) -> bool {
+        match *self._find(&self.root, data) {
+            None => false,
+            _    => true
+        }
+    }
 
-
+    fn _find<'a>(&self, current: &'a Link<T>, data: T) -> &'a Link<T>{
+        match current {
+            &None => current,
+            &Some(ref n) => {
+                if n.data > data {
+                    self._find(&n.left,data)
+                } else if n.data < data {
+                    self._find(&n.right,data)
+                } else {
+                    current
+                }
+            }
+        }
+    }
 
 
 
