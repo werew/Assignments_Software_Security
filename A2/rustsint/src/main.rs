@@ -18,6 +18,7 @@ enum Command {
 }
 
 
+#[derive(Debug)]
 struct Data {
    age: i32,    //TODO ask u32 ? 
    name: String,
@@ -105,7 +106,7 @@ fn main() {
                         sc.insert(Data {age: age, name: name});
                     },
                     Command::Erase{age, name} => {
-                        unimplemented!();
+                        sc.erase(Data {age: age, name: name});
                     },
                     Command::Contains{age, name} => {
                         println!("{}",sc.contains(Data {age: age, name: name}));

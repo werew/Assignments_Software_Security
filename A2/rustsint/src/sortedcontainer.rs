@@ -1,7 +1,9 @@
 use std::fmt::Display;
+use std::fmt::Debug;
 
 type Link<T> = Option<Box<Node<T>>>;
 
+#[derive(Debug)]
 struct Node<T> {
     data:  T,
     left:  Link<T>,
@@ -17,7 +19,7 @@ pub struct SortedContainer<T> {
 }
 
 
-impl<T: Display + PartialOrd> SortedContainer<T> {
+impl<T: Debug + Display + PartialOrd> SortedContainer<T> {
 
     pub fn new() -> Self {
         SortedContainer { root: None }
@@ -53,6 +55,52 @@ impl<T: Display + PartialOrd> SortedContainer<T> {
             _    => true
         }
     }
+
+
+    pub fn erase(&mut self, data: T) {
+
+        fn _take_leftmost<'a, T>(n: &'a mut Link<T>) -> &'a mut Link<T>{
+                
+               let has_left_branch = n.as_ref().unwrap().left.is_some();
+
+               if has_left_branch { 
+                   _take_leftmost(&mut n.as_mut().unwrap().left)
+               } else { n }
+        }
+
+
+
+        let target = self.find(&data);
+        if target.is_none() { return; } // None not found
+
+        let mut target_content = *target.take().unwrap();       // Note, dereference the box!
+       
+
+        if target_content.left.is_some() && target_content.right.is_some() {
+
+            target_content.data = {
+                /* Unlink */
+                let leftmost = _take_leftmost(&mut target_content.right);
+                let mut leftmost_content = leftmost.take().unwrap();
+                *leftmost = leftmost_content.right.take();
+
+                /* Return unlinked data */
+                leftmost_content.data
+            };
+            
+            /* Put back */
+            *target = Some(Box::new(target_content));
+
+
+        } else if target_content.left.is_some()  {
+            *target = target_content.left;
+
+        } else if target_content.right.is_some() {
+            *target = target_content.right;
+        }
+    }
+
+
 
 
 
