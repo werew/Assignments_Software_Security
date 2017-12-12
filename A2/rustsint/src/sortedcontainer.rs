@@ -204,6 +204,9 @@ impl<T: Debug + Display + PartialOrd> SortedContainer<T> {
 
 
 
+#[cfg(test)]
+mod tests {
+    use sortedcontainer::SortedContainer;
 // A basic test testing mostly a normal usage of the public API 
 #[test]
 fn test_base_api(){
@@ -709,3 +712,4 @@ fn test_erase_with_two_childen_3(){
         }
 }
 
+}
