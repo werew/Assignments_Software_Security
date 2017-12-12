@@ -1,3 +1,5 @@
 1. Used a generic find function
-2. Test separately sc logic with u32 type and Data struct logic
+2. Use of genersics, this has an advantage, for ex: can write tests with simpler data types
+3. test separately sc logic with u32 type and Data struct logic
+4. i32 for age ??
 
