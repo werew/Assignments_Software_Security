@@ -164,38 +164,7 @@ impl<T: Display + PartialOrd> SortedContainer<T> {
             }
         }
     }
-        /*
-        let new_node = Node {
-            data: data,
-            left: None,
-            right: None,
-        };
-        */
 
-
-
-
-        /* TODO
-        < werew> consider this method invocation: self._insertnode(&mut self.root, new_node); apparently
-            Rust dislike it, since self is borrowed twice: as immutable first and as mutable later, how
-            would you fix that ?
-        < mbrubeck> werew: One option is, instead of having `_insertnode` be a method that takes all of
-        `self`, have it be a function that takes only the values from `self` that it needs Another is to
-        use interior mutability (e.g. Cell or RefCell) to safely mutate fields of `self` or `self.root`
-        while they are shared And a third option is to temporarily move `self.root` out of `self`
-            (replacing it with a temporary value), pass it to the method, then move it back in.
-        < werew> Thank you for such complete answer :) For the first option, you mean an external function
-            (not a method of this struct) right ?
-        < mbrubeck> werew: Right It could be a method on some field of the struct, maybe (depending on what
-                    it does)
-        < werew> Totally agree thanks :)
-        */
-
-        /*
-        let mut root = self.root.take();
-        self._insertnode(&mut root, new_node);
-        self.root = root;
-        */
 
 }
 
