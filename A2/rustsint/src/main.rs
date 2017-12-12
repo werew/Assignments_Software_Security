@@ -20,10 +20,12 @@ enum Command {
 
 #[derive(Debug)]
 struct Data {
-   age: i32,    //TODO ask u32 ? 
+   age: i32,
    name: String,
 }
 
+
+// This is required in order to implement the trait PartialOrd
 impl PartialEq for Data {
     fn eq(&self, other: &Data) -> bool {
         self.age  == other.age &&
@@ -31,6 +33,8 @@ impl PartialEq for Data {
     }
 }
 
+
+// This is required in order to use the sortedcontainer module
 impl PartialOrd for Data {
     fn partial_cmp(&self,other: &Data) -> Option<Ordering> {
         Some(
@@ -41,6 +45,9 @@ impl PartialOrd for Data {
     }
 }
 
+
+// This is required in order to use the sortedcontainer module
+// since the data needs to be displayed when using the 'p' command
 impl fmt::Display for Data {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Age: {}, Name: {}", self.age, self.name)
@@ -56,7 +63,7 @@ impl fmt::Display for Data {
 fn parse_command(input: String) -> Command {
     let command_items: Vec<&str> = input.split_whitespace().collect();
 
-    // TODO ask, is this ok?
+    // TODO
     if command_items.is_empty() { 
         return Command::Error("please insert a command".to_string());
     }
@@ -89,6 +96,7 @@ fn parse_command(input: String) -> Command {
         (_, _) => Command::Error("invalid command.".to_string())
     }
 }
+
 
 fn main() {
 

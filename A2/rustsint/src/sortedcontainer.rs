@@ -1,7 +1,14 @@
 use std::fmt::Display;
 
+// A link is defined as an "Optional boxed Node"
+// Nodes are boxed so that they are allocated on the heap
+// We take advantage of Option in order to define empty
+// links (which would be equivalent to the value None)
 type Link<T> = Option<Box<Node<T>>>;
 
+
+// A tree's node, containing a generic data type
+// and two optional children
 #[derive(Debug)]
 struct Node<T> {
     data:  T,
@@ -10,87 +17,144 @@ struct Node<T> {
 }
 
 
+/// A binary search tree for a generic data types
+/// The tree act as a set, therefore it is not possible
+/// to add the same element twice
+/// note: the data type used must implement the
+/// Display and PartialOrd traits
 pub struct SortedContainer<T> {
     root: Link<T>,
 }
 
 
+
 impl<T: Display + PartialOrd> SortedContainer<T> {
 
+    /// Creates a new sortedcontainer
     pub fn new() -> Self {
         SortedContainer { root: None }
     }
 
 
-
+    /// Prints the content of the tree
+    /// indented according to the depth
     pub fn print(&self) {
-        self._printtree(&self.root,0);
+
+        // Helper function: print tree recursively
+        fn _printtree<T: Display>(current: &Link<T>, level: usize){
+            match current {
+                &None => println!("{:width$}(nil)", "", width = level),
+                &Some(ref n) => {
+                    println!("{:width$}{}", "", n.data, width = level);
+                    _printtree(&n.left,level+1);
+                    _printtree(&n.right,level+1);
+                }
+            }
+        }
+
+        // Use an helper function
+        _printtree(&self.root,0);
     }
 
 
-
+    /// Insert a new element into the tree
+    /// If the element is already present this
+    /// method does nothing
+    /// @param data: data to insert into the 
     pub fn insert(&mut self, data: T) {
-        let r = self.find(&data);
 
-        if r.is_none() {
-           *r = Some(
-                Box::new(Node {
-                   data: data,
-                   left: None,
-                   right: None,
-                })
-           );
+        // Find the link that should contain
+        // the given data
+        let l = self.find_pos(&data);
+
+        // Add the data only if the link
+        // is empty
+        if l.is_none() {
+           *l = Some(Box::new(
+                Node {data: data, left: None, right: None}
+           ));
         }
     }
 
 
-
+    /// Test whether the tree contains 
+    /// the given data
+    /// @param data: the data in object
+    /// @return true if the tree contains the
+    ///     data, false otherwise
     pub fn contains(&mut self, data: T) -> bool {
-        match *self.find(&data) {
+        match *self.find_pos(&data) {
             None => false,
             _    => true
         }
     }
 
 
+    /// Remove an element from the tree. If
+    /// the element is not found nothing is done
+    /// @param data: the element to remove
     pub fn erase(&mut self, data: T) {
 
+        // Helper function: find the leftmost link starting
+        // from the provided link (note: this function is
+        // used so that we can target the in-order successor
+        // of the element we want to erase if the latter has
+        // two children)
+        // @param n: the link from where to start
+        // @return a mutable reference to the leftmost link
         fn _take_leftmost<'a, T>(n: &'a mut Link<T>) -> &'a mut Link<T>{
-                
-               let has_left_branch = n.as_ref().unwrap().left.is_some();
+            
+            let has_left_branch = n.as_ref().unwrap().left.is_some();
 
-               if has_left_branch { 
-                   _take_leftmost(&mut n.as_mut().unwrap().left)
-               } else { n }
+            if has_left_branch { 
+                _take_leftmost(&mut n.as_mut().unwrap().left)
+            } else { n }
         }
 
-
-
-        let target = self.find(&data);
+        // Find the target node to erase
+        let target = self.find_pos(&data);
         if target.is_none() { return; } // None not found
 
-        let mut target_content = *target.take().unwrap();       // Note, dereference the box!
+        // Remove the target and get its content
+        // note1: we use the method `take` so that we can
+        // "move" the content of the target node by 
+        // temporarily replacing it with a None
+        // note2: we need to dereference the boxed content
+        // in order to tear it apart and let the borrow 
+        // checker distinguish the different fields 
+        let mut target_content = *target.take().unwrap();       
 
         if target_content.left.is_some() && target_content.right.is_some() {
+            // Node has two children ?
 
+            // Substitute the data of the target with 
+            // the content of the in-order successor
             target_content.data = {
-                /* Unlink */
+                // Find the leftmost node on the right branch
                 let leftmost = _take_leftmost(&mut target_content.right);
+
+                // Unlink the node from the list
                 let mut leftmost_content = leftmost.take().unwrap();
                 *leftmost = leftmost_content.right.take();
 
-                /* Return unlinked data */
+                // Return unlinked data
                 leftmost_content.data
             };
             
-            /* Put back */
+            // Put the target (with different data) 
+            // node back on the tree
             *target = Some(Box::new(target_content));
 
-
         } else if target_content.left.is_some()  {
+            // Node has only the left child 
+        
+            // Substitute the target with his left child
             *target = target_content.left;
 
         } else if target_content.right.is_some() {
+            // Node has only the right child
+
+            // Substitute the target with his right child
             *target = target_content.right;
         }
     }
@@ -98,9 +162,17 @@ impl<T: Display + PartialOrd> SortedContainer<T> {
 
 
 
+    // This private function is used internally to find the
+    // position of the node which should contain the specified
+    // data. Note that if such node doesn't exist the returned
+    // link will point to an empty leaf which represent a valid
+    // position for that node (so that it can for example be
+    // inserted there)
+    // @param data: data to search for
+    // @return a mutable reference to a link
+    fn find_pos(&mut self, data: &T) -> &mut Link<T>{
 
-    fn find(&mut self, data: &T) -> &mut Link<T>{
-
+        // Helper function: find specified data recursively
         fn _find<'a, T: PartialOrd>( current: &'a mut Link<T>, data: &T) -> &'a mut Link<T>{
 
             enum Direction { Right, Left, Arrived }
@@ -121,30 +193,15 @@ impl<T: Display + PartialOrd> SortedContainer<T> {
             }
         }
 
+        // Use helper function
         _find(&mut self.root, data)
     }
 
 
-
-
-
-
-
-    fn _printtree(&self, current: &Link<T>, level: usize){
-        match current {
-            &None => println!("{:width$}(nil)", "", width = level),
-            &Some(ref n) => {
-                println!("{:width$}{}", "", n.data, width = level);
-                self._printtree(&n.left,level+1);
-                self._printtree(&n.right,level+1);
-            }
-        }
-    }
-
-
-
-
-    /************* OLD *************************/
+    /*
+    // This function exists for nothing but illustrative purposes:
+    // it shows a different approach for inserting a node without
+    // the use of the find_pos function
     fn _insertnode(&self, current: &mut Link<T>, new_node: Node<T>){
         match current {
             &mut None => {
@@ -164,20 +221,22 @@ impl<T: Display + PartialOrd> SortedContainer<T> {
             }
         }
     }
+    */
 
 
 }
 
 
-
+/********************** TESTS **************************/
 
 
 #[cfg(test)]
 mod tests {
+
     use sortedcontainer::SortedContainer;
 
 
-    // A basic test testing mostly a normal usage of the public API 
+    /// A basic test testing mostly a normal usage of the public API 
     #[test]
     fn test_base_api(){
 
@@ -235,7 +294,7 @@ mod tests {
     }
 
 
-    // 
+    /// Tests a bad usage of the public API performing a double removal
     #[test]
     fn test_double_erase(){
 
@@ -259,7 +318,7 @@ mod tests {
 
 
 
-    // Test the deletion of a node with no children
+    /// Test the deletion of a node with no children
     #[test]
     fn test_erase_no_children(){
 
@@ -315,6 +374,7 @@ mod tests {
     }
 
 
+    /// Test the deletion of a node with only one child
     #[test]
     fn test_erase_with_one_child(){
 
@@ -374,7 +434,7 @@ mod tests {
 
 
 
-    // Test the deletion of a node with two children twice (if node is root, or not)
+    /// Test the deletion of a node with two children twice (if node is root, or not)
     #[test]
     fn test_erase_with_two_children_1(){
 
@@ -483,7 +543,7 @@ mod tests {
 
 
 
-    // Test the deletion of a node with two children, who each have two children as well
+    /// Test the deletion of a node with two children who each have two children as well
     #[test]
     fn test_erase_with_two_children_2(){
 
@@ -577,7 +637,7 @@ mod tests {
 
 
 
-    // Test the deletion of a non-root node with two children, who each have two children as well
+    /// Test the deletion of a non-root node with two children who each have two children as well
     #[test]
     fn test_erase_with_two_children_3(){
 
