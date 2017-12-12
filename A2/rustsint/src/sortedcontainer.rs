@@ -1,5 +1,4 @@
 use std::fmt::Display;
-use std::fmt::Debug;
 
 type Link<T> = Option<Box<Node<T>>>;
 
@@ -16,7 +15,7 @@ pub struct SortedContainer<T> {
 }
 
 
-impl<T: Debug + Display + PartialOrd> SortedContainer<T> {
+impl<T: Display + PartialOrd> SortedContainer<T> {
 
     pub fn new() -> Self {
         SortedContainer { root: None }
