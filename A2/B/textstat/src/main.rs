@@ -112,12 +112,10 @@ fn print_stats(count: HashMap<String, u32>){
     }
 
     let mut count_vec: Vec<_> = count.iter().collect();
-    count_vec.sort_by(|a,b| a.1.cmp(b.1).reverse());
+    count_vec.sort_by(|a,b| b.1.cmp(a.1));
 
     let mut count_len_vec: Vec<_> = count_length.iter().collect();
-    count_len_vec.sort_by(|a,b| a.1.cmp(b.1).reverse());
-
-
+    count_len_vec.sort_by(|a,b| a.0.cmp(b.0));
 
     // TODO maybe improve the style (maybe in a table? check how to format )
     println!("############## STATS ################");
