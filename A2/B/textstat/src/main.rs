@@ -113,9 +113,11 @@ fn print_stats(count: HashMap<String, u32>){
 
     let mut count_vec: Vec<_> = count.iter().collect();
     count_vec.sort_by(|a,b| b.1.cmp(a.1));
+    count_vec.truncate(10); 
 
     let mut count_len_vec: Vec<_> = count_length.iter().collect();
     count_len_vec.sort_by(|a,b| a.0.cmp(b.0));
+    count_len_vec.truncate(10); 
 
     // TODO maybe improve the style (maybe in a table? check how to format )
     println!("############## STATS ################");
@@ -124,12 +126,12 @@ fn print_stats(count: HashMap<String, u32>){
     println!("Average size: {}",avg_size);
 
     println!("######### COUNT BY LENGTH ###########");
-    for &(l,c) in &count_len_vec[..10] { 
+    for &(l,c) in &count_len_vec { 
         println!("Words of {} characters: {}",l,c); 
     }
 
     println!("######### TOP 10 MOST USED ###########");
-    for &(w,c) in &count_vec[..10] { 
+    for &(w,c) in &count_vec { 
         println!("{} (used {} times)",w,c); 
     }
 
