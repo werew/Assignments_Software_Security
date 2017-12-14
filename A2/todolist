@@ -1,0 +1,6 @@
+- both utf8 and bytes
+  (explain problem with rust and char iterator over bufreader)
+- test speed different versions
+- i32 to u32 and explain why
+- fix crashes and explain
+- change format p command
