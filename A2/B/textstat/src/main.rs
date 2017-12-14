@@ -9,11 +9,24 @@ use std::io::Result;
 use std::collections::hash_map::HashMap;
 
 
+
+/// Check whether a character has to be
+/// considered as part of a word
+/// @param c: a reference to the character to check
+/// @return true if the char is part of a word
+///     false otherwise
 fn is_word_char(c: &char) -> bool {
     c.is_alphanumeric() || c.eq(&'\'')
 }
 
 
+
+/// Reads a single word
+/// @param it: an iterator over the bytes to read
+/// @return None if no words have been found
+///     otherwise a Result instance containing
+///     a string with the word read in case of 
+///     success or an error otherwise
 fn read_word(it: &mut Bytes<BufReader<File>>) -> Option<Result<String>> {
 
     let mut is_reading = false;
@@ -50,12 +63,15 @@ fn read_word(it: &mut Bytes<BufReader<File>>) -> Option<Result<String>> {
 }
 
 
+/// Counts the number of occurrences of each word
+/// @param buf: a buffer reader
+/// @return an HashMap mapping each word (as a String)
+///     to the number of occurrences (as u64)
+fn gen_wordcount(buf: BufReader<File>) -> HashMap<String,u64> {
 
-fn gen_wordcount(buf: BufReader<File>) -> HashMap<String,u32> {
-
-    let mut hm = HashMap::new();
-
+    let mut hm = HashMap::new();    
     let mut it = buf.bytes();
+
     loop {
 
         // Read one word 
@@ -69,9 +85,11 @@ fn gen_wordcount(buf: BufReader<File>) -> HashMap<String,u32> {
         match r {
             Ok(w)  => {
                 // Successful read: increment counter
+                // note: we always lowercase the words
+                //       so that we don't
                 let counter = hm.entry(w.to_lowercase())
                                 .or_insert(0);
-                *counter += 1;  // TODO Overflow ??
+                *counter += 1; 
             },
 
             Err(e) => {
@@ -87,7 +105,7 @@ fn gen_wordcount(buf: BufReader<File>) -> HashMap<String,u32> {
 
 
 // TODO meaningful naming
-fn print_stats(count: HashMap<String, u32>){
+fn print_stats(count: HashMap<String, u64>){
 
     let mut total = 0;
     let mut total_diff = 0;
