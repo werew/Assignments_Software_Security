@@ -4,3 +4,5 @@
 - i32 to u32 and explain why
 - fix crashes and explain
 - change format p command
+
+- lack of libs, explain why use a separator
