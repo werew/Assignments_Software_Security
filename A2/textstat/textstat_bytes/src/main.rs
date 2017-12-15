@@ -86,7 +86,6 @@ fn gen_wordcount(buf: BufReader<File>) -> HashMap<String,u64> {
             Ok(w)  => {
                 // Successful read: increment counter
                 // note: we always lowercase the words
-                //       so that we don't
                 let counter = hm.entry(w.to_lowercase())
                                 .or_insert(0);
                 *counter += 1; 
@@ -104,52 +103,63 @@ fn gen_wordcount(buf: BufReader<File>) -> HashMap<String,u64> {
 }
 
 
-// TODO meaningful naming
-fn print_stats(count: HashMap<String, u64>){
 
-    let mut total = 0;
-    let mut total_diff = 0;
-    let mut avg_size : f64 = 0.0;
-    let mut count_length = HashMap::new();
+/// Prints some statistics about the text
+/// provided an HashMap which contains the
+/// words and the number of occurrences
+/// @param words_count: an HashMap mapping each 
+///     word to the number of occurrences
+fn print_stats(words_count: HashMap<String, u64>){
 
-    for (word, count) in count.iter() {
+    let mut total_words = 0;        // Amount of words in the text
+    let mut total_differents = 0;   // Amount of different words
+    let mut sum_sizes : usize = 0;  // Summation of words' sizes
+    let mut count_by_length = HashMap::new();  // How many words for each length
 
-        // The division is distributed 
-        // (avg_size*total + k.len()*v) / new_total
-        let new_total = total + count;
-        avg_size = (avg_size   as f64 / new_total as f64) *  total as f64 + 
-                   (word.len() as f64 / new_total as f64) * *count as f64;
+    for (word, count) in words_count.iter() {
 
-        total = new_total;
-        total_diff += 1;
+        // Increment all general counters
+        sum_sizes        += word.len() * (*count as usize);
+        total_words      += count;
+        total_differents += 1;
 
-        let counter = count_length.entry(word.len())
-                                  .or_insert(0);
-        *counter += count;  // TODO Overflow ??
-
+        // Increment counter for this specific length
+        // initializing counter at zero if this is the
+        // first word of this length
+        let counter = count_by_length.entry(word.len())
+                                     .or_insert(0); 
+        *counter += count;
     }
 
-    let mut count_vec: Vec<_> = count.iter().collect();
-    count_vec.sort_by(|a,b| b.1.cmp(a.1));
-    count_vec.truncate(10); 
 
-    let mut count_len_vec: Vec<_> = count_length.iter().collect();
-    count_len_vec.sort_by(|a,b| a.0.cmp(b.0));
-    count_len_vec.truncate(10); 
+    // Calculate average size
+    let avg_size = sum_sizes as f64 / total_words as f64;
 
-    // TODO maybe improve the style (maybe in a table? check how to format )
+    // List of pairs (length, count) sorted by length
+    let mut list_by_length: Vec<_> = count_by_length.iter().collect();
+    list_by_length.sort_by(|a,b| a.0.cmp(b.0));
+    list_by_length.truncate(10);    // Display only the top 10
+
+    // List of pairs (word, usage) sorted by usage
+    let mut list_by_usage: Vec<_> = words_count.iter().collect();
+    list_by_usage.sort_by(|a,b| b.1.cmp(a.1));
+    list_by_usage.truncate(10);     // Display only the top 10
+
+
+    /************ Display statistics **************/
+
     println!("############## STATS ################");
-    println!("Total: {}",total);
-    println!("Total differents: {}",total_diff);
+    println!("Total: {}",total_words);
+    println!("Total differents: {}",total_differents);
     println!("Average size: {}",avg_size);
 
     println!("######### COUNT BY LENGTH ###########");
-    for &(l,c) in &count_len_vec { 
+    for &(l,c) in &list_by_length{ 
         println!("Words of {} characters: {}",l,c); 
     }
 
     println!("######### TOP 10 MOST USED ###########");
-    for &(w,c) in &count_vec { 
+    for &(w,c) in &list_by_usage{ 
         println!("{} (used {} times)",w,c); 
     }
 
