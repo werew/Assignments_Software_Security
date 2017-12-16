@@ -63,7 +63,7 @@ impl fmt::Display for Data {
 fn parse_command(input: String) -> Command {
     let command_items: Vec<&str> = input.split_whitespace().collect();
 
-    // TODO
+    // Fix: check if the input is empty first, so we don't panic otherwise
     if command_items.is_empty() { 
         return Command::Error("please insert a command".to_string());
     }
