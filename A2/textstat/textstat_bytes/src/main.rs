@@ -9,6 +9,9 @@ use std::io::Result;
 use std::collections::hash_map::HashMap;
 
 
+const MAX_TOPUSAGE_LIST : usize = 10;  // Display ten most used words
+const MAX_WLENGTH : usize = 10;        // Display count up to then chars
+
 
 /// Check whether a character has to be
 /// considered as part of a word
@@ -118,17 +121,21 @@ fn print_stats(words_count: HashMap<String, u64>){
 
     for (word, count) in words_count.iter() {
 
+        let wlen = word.len();
+
         // Increment all general counters
-        sum_sizes        += word.len() * (*count as usize);
+        sum_sizes        += wlen * (*count as usize);
         total_words      += count;
         total_differents += 1;
 
         // Increment counter for this specific length
         // initializing counter at zero if this is the
         // first word of this length
-        let counter = count_by_length.entry(word.len())
-                                     .or_insert(0); 
-        *counter += count;
+        if wlen <= MAX_WLENGTH {
+            let counter = count_by_length.entry(wlen)
+                                         .or_insert(0); 
+            *counter += count;
+        }
     }
 
 
@@ -138,12 +145,11 @@ fn print_stats(words_count: HashMap<String, u64>){
     // List of pairs (length, count) sorted by length
     let mut list_by_length: Vec<_> = count_by_length.iter().collect();
     list_by_length.sort_by(|a,b| a.0.cmp(b.0));
-    list_by_length.truncate(10);    // Display only the top 10
 
     // List of pairs (word, usage) sorted by usage
     let mut list_by_usage: Vec<_> = words_count.iter().collect();
     list_by_usage.sort_by(|a,b| b.1.cmp(a.1));
-    list_by_usage.truncate(10);     // Display only the top 10
+    list_by_usage.truncate(MAX_TOPUSAGE_LIST);     
 
 
     /************ Display statistics **************/
@@ -158,7 +164,7 @@ fn print_stats(words_count: HashMap<String, u64>){
         println!("Words of {} characters: {}",l,c); 
     }
 
-    println!("######### TOP 10 MOST USED ###########");
+    println!("######### TOP {} MOST USED ###########",MAX_TOPUSAGE_LIST);
     for &(w,c) in &list_by_usage{ 
         println!("{} (used {} times)",w,c); 
     }
