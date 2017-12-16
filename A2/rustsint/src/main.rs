@@ -9,9 +9,9 @@ use std::fmt;
 
 #[derive(Debug)]
 enum Command {
-    Insert{age: i32, name: String},
-    Erase{age: i32, name: String},
-    Contains{age: i32, name: String},
+    Insert{age: u32, name: String},
+    Erase{age: u32, name: String},
+    Contains{age: u32, name: String},
     Print,
     Exit,
     Error(String)
@@ -20,7 +20,7 @@ enum Command {
 
 #[derive(Debug)]
 struct Data {
-   age: i32,
+   age: u32,
    name: String,
 }
 
@@ -72,21 +72,21 @@ fn parse_command(input: String) -> Command {
         ("p", 1) => Command::Print,
         ("x", 1) => Command::Exit,
         ("i", 3) => {
-            if let Ok(age) = command_items[1].parse::<i32>() {
+            if let Ok(age) = command_items[1].parse::<u32>() {
                 Command::Insert{age: age, name: command_items[2].to_string()}
             } else {
                 Command::Error("unable to parse int (age).".to_string())
             }
         },
         ("e", 3) => {
-            if let Ok(age) = command_items[1].parse::<i32>() {
+            if let Ok(age) = command_items[1].parse::<u32>() {
                 Command::Erase{age: age, name: command_items[2].to_string()}
             } else {
                 Command::Error("unable to parse int (age).".to_string())
             }
         },
         ("c", 3) => {
-            if let Ok(age) = command_items[1].parse::<i32>() {
+            if let Ok(age) = command_items[1].parse::<u32>() {
                 Command::Contains{age: age, name: command_items[2].to_string()}
             } else {
                 Command::Error("unable to parse int (age).".to_string())
