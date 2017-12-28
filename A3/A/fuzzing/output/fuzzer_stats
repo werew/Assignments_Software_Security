@@ -1,0 +1,27 @@
+start_time        : 1513866541
+last_update       : 1514483229
+fuzzer_pid        : 20074
+cycles_done       : 3
+execs_done        : 58538984
+execs_per_sec     : 3.28
+paths_total       : 1290
+paths_favored     : 80
+paths_found       : 1289
+paths_imported    : 0
+max_depth         : 21
+cur_path          : 1191
+pending_favs      : 0
+pending_total     : 640
+variable_paths    : 0
+stability         : 100.00%
+bitmap_cvg        : 1.31%
+unique_crashes    : 0
+unique_hangs      : 0
+last_path         : 1514457490
+last_crash        : 0
+last_hang         : 0
+execs_since_crash : 58538984
+exec_timeout      : 40
+afl_banner        : sint
+afl_version       : 2.51b
+command_line      : /home/werew/afl-2.51b/afl-fuzz -i input/ -o output/ -m800 -- ./sint
