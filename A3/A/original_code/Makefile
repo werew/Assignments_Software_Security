@@ -4,7 +4,8 @@ OBJ=sortedcontainer.o \
     main.o \
 	test.o
 
-OBJ_32=$(patsubst %.o, %_32.o, $(OBJ))
+OBJ_AFL_64=$(patsubst %.o, %_afl_64.o, $(OBJ))
+OBJ_AFL_32_ASAN=$(patsubst %.o, %_afl_32_asan.o, $(OBJ))
 
 OBJOK=../../teacher/assignment1/sortedcontainer_ok.o \
     ../../teacher/assignment1/main_ok.o \
@@ -34,8 +35,13 @@ include .depend
 $(OBJ): %.o : %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
-$(OBJ_32): %_32.o : %.c
-	$(CC) -c -m32 $(CFLAGS) $< -o $@
+$(OBJ_AFL_64): %_afl_64.o : %.c
+	afl-gcc -c $(CFLAGS) $< -o $@
+
+$(OBJ_AFL_32_ASAN): %_afl_32_asan.o : %.c
+	afl-gcc -c -m32 -fsanitize=address $(CFLAGS) $< -o $@
+
+
 
 sint: $(OBJ)
 	$(CC) $^ $(CFLAGS) -o $@ -lm
@@ -43,12 +49,12 @@ sint: $(OBJ)
 ok: $(OBJOK)
 	$(CC) $^ $(CFLAGS) -o sint_ok -lm
 
-sint_afl: $(OBJ)
+sint_afl: $(OBJ_AFL_64)
 	afl-gcc $^ -o sint_afl -lm
 
-sint_afl_asan: $(OBJ_32)
-	echo $(OBJ_32)
+sint_afl_asan: $(OBJ_AFL_32_ASAN)
 	afl-gcc $^ -m32 -fsanitize=address -o sint_afl_asan -lm
+
 
 fuzz: sint_afl
 	afl-fuzz -i ../fuzzing/input/ -o output/ -- ./sint_afl
@@ -56,4 +62,5 @@ fuzz: sint_afl
 fuzz_asan: sint_afl_asan
 	afl-fuzz -i ../fuzzing/input/ -o output/ -m800 -- ./sint_afl_asan
 
-	
+fuzz_valgrind: sint_afl
+	afl-fuzz -i ../fuzzing/input/ -o output/ -n -- valgrind.bin ./sint_afl
