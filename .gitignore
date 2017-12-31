@@ -2,6 +2,9 @@
 # Created by https://www.gitignore.io/api/c
 
 sint
+sint_afl
+sint_afl_asan
+
 .depend
 .*.swp
 
