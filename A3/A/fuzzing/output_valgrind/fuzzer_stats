@@ -1,0 +1,27 @@
+start_time        : 1514728374
+last_update       : 1514822414
+fuzzer_pid        : 2912
+cycles_done       : 19618
+execs_done        : 500594
+execs_per_sec     : 7.09
+paths_total       : 1
+paths_favored     : 0
+paths_found       : 0
+paths_imported    : 0
+max_depth         : 1
+cur_path          : 0
+pending_favs      : 0
+pending_total     : 0
+variable_paths    : 0
+stability         : 100.00%
+bitmap_cvg        : 0.00%
+unique_crashes    : 0
+unique_hangs      : 500
+last_path         : 0
+last_crash        : 0
+last_hang         : 1514753042
+execs_since_crash : 500594
+exec_timeout      : 380
+afl_banner        : valgrind.bin
+afl_version       : 2.51b
+command_line      : afl-fuzz -i ../fuzzing/input/ -o output/ -n -- valgrind.bin ./sint_afl
