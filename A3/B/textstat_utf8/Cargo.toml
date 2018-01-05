@@ -1,0 +1,7 @@
+[package]
+name = "textstat"
+version = "0.1.0"
+authors = ["werew <luigi.coniglio@yahoo.com>"]
+
+[dependencies]
+afl = "0.3"
