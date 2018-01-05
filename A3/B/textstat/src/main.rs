@@ -1,6 +1,5 @@
 extern crate afl;
 use std::process;
-use std::fs::File;
 use std::error::Error;
 use std::str::Chars;
 use std::io::BufRead;
