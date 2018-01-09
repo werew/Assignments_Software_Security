@@ -1,0 +1,27 @@
+start_time        : 1515433071
+last_update       : 1515529163
+fuzzer_pid        : 9844
+cycles_done       : 0
+execs_done        : 19664048
+execs_per_sec     : 193.26
+paths_total       : 421
+paths_favored     : 98
+paths_found       : 419
+paths_imported    : 0
+max_depth         : 4
+cur_path          : 181
+pending_favs      : 75
+pending_total     : 377
+variable_paths    : 0
+stability         : 100.00%
+bitmap_cvg        : 1.19%
+unique_crashes    : 12
+unique_hangs      : 25
+last_path         : 1515524779
+last_crash        : 1515507796
+last_hang         : 1515507857
+execs_since_crash : 4263820
+exec_timeout      : 60
+afl_banner        : pdfcrack
+afl_version       : 2.51b
+command_line      : /home/werew/afl-2.51b/afl-fuzz -i in/ -x pdf.dict -o out -m800 /home/werew/pdfcrack/pdfcrack -f @@
