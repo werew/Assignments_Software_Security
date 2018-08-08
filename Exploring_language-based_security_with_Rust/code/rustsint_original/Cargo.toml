@@ -1,0 +1,6 @@
+[package]
+name = "rustsint"
+version = "0.1.0"
+authors = ["Maarten Everts <maarten.everts@tno.nl>"]
+
+[dependencies]
